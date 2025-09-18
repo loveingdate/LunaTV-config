@@ -8,9 +8,6 @@
     <link rel="manifest" href="manifest.json">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌙</text></svg>">
     
-    <!-- Monaco Editor -->
-    <link rel="stylesheet" data-name="vs/editor/editor.main" href="https://cdn.jsdelivr.net/npm/monaco-editor@0.44.0/min/vs/editor/editor.main.css">
-    
     <!-- 样式文件 -->
     <link rel="stylesheet" href="styles/main.css">
 </head>
@@ -150,7 +147,70 @@
     <input type="file" id="file-input" accept=".json" style="display: none;">
 
     <!-- 脚本加载 -->
-    <script src="https://cdn.jsdelivr.net/npm/monaco-editor@0.44.0/min/vs/loader.js"></script>
+    <!-- 使用多个CDN备选方案确保Monaco Editor能够加载 -->
+    <script>
+        // Monaco Editor 加载器
+        window.monacoLoaderConfig = {
+            paths: {
+                'vs': 'https://cdn.jsdelivr.net/npm/monaco-editor@0.44.0/min/vs'
+            },
+            'vs/nls': {
+                availableLanguages: {
+                    '*': 'zh-cn'
+                }
+            }
+        };
+        
+        // 备选CDN列表
+        const monacoUrls = [
+            'https://cdn.jsdelivr.net/npm/monaco-editor@0.44.0/min/vs/loader.js',
+            'https://unpkg.com/monaco-editor@0.44.0/min/vs/loader.js',
+            'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.44.0/min/vs/loader.min.js'
+        ];
+        
+        async function loadMonaco() {
+            for (const url of monacoUrls) {
+                try {
+                    console.log('尝试从CDN加载Monaco Editor:', url);
+                    await new Promise((resolve, reject) => {
+                        const script = document.createElement('script');
+                        script.src = url;
+                        script.onload = resolve;
+                        script.onerror = reject;
+                        script.timeout = 10000; // 10秒超时
+                        document.head.appendChild(script);
+                    });
+                    
+                    // 配置Monaco路径
+                    require.config(window.monacoLoaderConfig);
+                    
+                    // 加载Monaco Editor
+                    require(['vs/editor/editor.main'], function() {
+                        console.log('Monaco Editor 加载成功');
+                        window.monacoReady = true;
+                        
+                        // 触发应用初始化
+                        document.dispatchEvent(new Event('monaco-ready'));
+                    });
+                    
+                    return; // 成功加载，退出循环
+                } catch (error) {
+                    console.warn('CDN加载失败:', url, error);
+                    continue; // 尝试下一个CDN
+                }
+            }
+            
+            // 所有CDN都失败，使用备用编辑器
+            console.error('所有Monaco Editor CDN都无法加载，使用备用编辑器');
+            window.useBackupEditor = true;
+            document.dispatchEvent(new Event('monaco-ready'));
+        }
+        
+        // 开始加载Monaco
+        loadMonaco();
+    </script>
+    
+    <!-- 应用脚本 -->
     <script src="scripts/utils.js"></script>
     <script src="scripts/github-api.js"></script>
     <script src="scripts/editor.js"></script>
