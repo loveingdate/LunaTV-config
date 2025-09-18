@@ -1,6 +1,6 @@
 /**
- * Luna TV 配置编辑器 - 编辑器功能模块
- * 处理 Monaco Editor 相关功能
+ * Luna TV 配置编辑器 - 编辑器功能模块（修复版）
+ * 处理 Monaco Editor 相关功能，包含备用编辑器
  */
 
 class EditorManager {
@@ -11,6 +11,7 @@ class EditorManager {
         this.validationTimeout = null;
         this.autoSaveTimeout = null;
         this.autoSaveInterval = 30000; // 30秒自动保存
+        this.useBackupEditor = false;
     }
 
     /**
@@ -18,62 +19,161 @@ class EditorManager {
      */
     async init(containerId = 'monaco-editor') {
         try {
-            // 等待 Monaco Editor 加载完成
+            console.log('开始初始化编辑器...');
+            
+            // 等待 Monaco Editor 加载完成或使用备用编辑器
             await this.waitForMonaco();
             
-            // 创建编辑器实例
-            this.editor = monaco.editor.create(document.getElementById(containerId), {
-                value: this.getDefaultContent(),
-                language: 'json',
-                theme: 'vs-dark',
-                automaticLayout: true,
-                formatOnPaste: true,
-                formatOnType: true,
-                minimap: {
-                    enabled: true
-                },
-                scrollBeyondLastLine: false,
-                wordWrap: 'on',
-                lineNumbers: 'on',
-                glyphMargin: true,
-                folding: true,
-                foldingStrategy: 'indentation',
-                showFoldingControls: 'always',
-                fontFamily: 'Consolas, "Courier New", monospace',
-                fontSize: 14,
-                tabSize: 2,
-                insertSpaces: true,
-                detectIndentation: true,
-                renderWhitespace: 'boundary',
-                renderControlCharacters: true,
-                quickSuggestions: {
-                    other: true,
-                    comments: false,
-                    strings: false
-                },
-                parameterHints: {
-                    enabled: true
-                },
-                suggestOnTriggerCharacters: true,
-                acceptSuggestionOnEnter: 'on',
-                accessibilitySupport: 'auto'
-            });
-
+            if (window.useBackupEditor || !window.monaco) {
+                console.log('使用备用编辑器');
+                this.initBackupEditor(containerId);
+            } else {
+                console.log('使用Monaco Editor');
+                this.initMonacoEditor(containerId);
+            }
+            
             // 设置编辑器事件监听
             this.setupEventListeners();
             
-            // 设置 JSON 验证
-            this.setupJSONValidation();
-            
             // 初始化内容
-            this.currentContent = this.editor.getValue();
+            this.currentContent = this.getValue();
             
-            console.log('Monaco Editor 初始化完成');
+            console.log('编辑器初始化完成');
             return this.editor;
         } catch (error) {
             console.error('编辑器初始化失败:', error);
-            throw error;
+            // 降级到备用编辑器
+            console.log('降级到备用编辑器');
+            this.initBackupEditor(containerId);
+            this.setupEventListeners();
+            this.currentContent = this.getValue();
         }
+    }
+
+    /**
+     * 初始化Monaco编辑器
+     */
+    initMonacoEditor(containerId) {
+        this.editor = monaco.editor.create(document.getElementById(containerId), {
+            value: this.getDefaultContent(),
+            language: 'json',
+            theme: 'vs-dark',
+            automaticLayout: true,
+            formatOnPaste: true,
+            formatOnType: true,
+            minimap: {
+                enabled: true
+            },
+            scrollBeyondLastLine: false,
+            wordWrap: 'on',
+            lineNumbers: 'on',
+            glyphMargin: true,
+            folding: true,
+            foldingStrategy: 'indentation',
+            showFoldingControls: 'always',
+            fontFamily: 'Consolas, "Courier New", monospace',
+            fontSize: 14,
+            tabSize: 2,
+            insertSpaces: true,
+            detectIndentation: true,
+            renderWhitespace: 'boundary',
+            renderControlCharacters: true,
+            quickSuggestions: {
+                other: true,
+                comments: false,
+                strings: false
+            },
+            parameterHints: {
+                enabled: true
+            },
+            suggestOnTriggerCharacters: true,
+            acceptSuggestionOnEnter: 'on',
+            accessibilitySupport: 'auto'
+        });
+
+        // 设置 JSON 验证
+        this.setupJSONValidation();
+        this.useBackupEditor = false;
+    }
+
+    /**
+     * 初始化备用编辑器（普通textarea）
+     */
+    initBackupEditor(containerId) {
+        const container = document.getElementById(containerId);
+        container.innerHTML = '';
+        
+        const textarea = document.createElement('textarea');
+        textarea.className = 'backup-editor';
+        textarea.value = this.getDefaultContent();
+        textarea.spellcheck = false;
+        
+        // 设置样式
+        Object.assign(textarea.style, {
+            width: '100%',
+            height: '100%',
+            border: 'none',
+            outline: 'none',
+            resize: 'none',
+            fontFamily: 'Consolas, "Courier New", monospace',
+            fontSize: '14px',
+            lineHeight: '1.5',
+            padding: '16px',
+            backgroundColor: 'var(--bg-primary)',
+            color: 'var(--text-primary)',
+            tabSize: '2'
+        });
+        
+        // Tab键支持
+        textarea.addEventListener('keydown', (e) => {
+            if (e.key === 'Tab') {
+                e.preventDefault();
+                const start = textarea.selectionStart;
+                const end = textarea.selectionEnd;
+                
+                textarea.value = textarea.value.substring(0, start) + '  ' + textarea.value.substring(end);
+                textarea.selectionStart = textarea.selectionEnd = start + 2;
+            }
+        });
+        
+        container.appendChild(textarea);
+        this.editor = {
+            textarea: textarea,
+            getValue: () => textarea.value,
+            setValue: (value) => { textarea.value = value; },
+            onDidChangeModelContent: (callback) => {
+                textarea.addEventListener('input', callback);
+            },
+            onDidChangeCursorPosition: (callback) => {
+                textarea.addEventListener('selectionchange', () => {
+                    const lines = textarea.value.substr(0, textarea.selectionStart).split('\n');
+                    callback({
+                        position: {
+                            lineNumber: lines.length,
+                            column: lines[lines.length - 1].length + 1
+                        }
+                    });
+                });
+            },
+            onDidFocusEditorText: (callback) => {
+                textarea.addEventListener('focus', callback);
+            },
+            onDidBlurEditorText: (callback) => {
+                textarea.addEventListener('blur', callback);
+            },
+            onKeyDown: (callback) => {
+                textarea.addEventListener('keydown', callback);
+            },
+            layout: () => {}, // 备用编辑器不需要layout
+            dispose: () => {
+                if (textarea.parentNode) {
+                    textarea.parentNode.removeChild(textarea);
+                }
+            }
+        };
+        
+        this.useBackupEditor = true;
+        Utils.showToast('正在使用简化编辑器模式', 'info', 3000);
     }
 
     /**
@@ -81,23 +181,34 @@ class EditorManager {
      */
     waitForMonaco() {
         return new Promise((resolve, reject) => {
-            if (typeof monaco !== 'undefined') {
+            // 如果已经标记使用备用编辑器，直接resolve
+            if (window.useBackupEditor) {
                 resolve();
                 return;
             }
             
-            let attempts = 0;
-            const maxAttempts = 50;
-            const checkInterval = setInterval(() => {
-                attempts++;
-                if (typeof monaco !== 'undefined') {
-                    clearInterval(checkInterval);
-                    resolve();
-                } else if (attempts >= maxAttempts) {
-                    clearInterval(checkInterval);
-                    reject(new Error('Monaco Editor 加载超时'));
-                }
-            }, 100);
+            // 如果Monaco已经加载，直接resolve
+            if (window.monaco) {
+                resolve();
+                return;
+            }
+            
+            // 监听monaco-ready事件
+            const onMonacoReady = () => {
+                document.removeEventListener('monaco-ready', onMonacoReady);
+                clearTimeout(timeout);
+                resolve();
+            };
+            
+            document.addEventListener('monaco-ready', onMonacoReady);
+            
+            // 设置超时（降低超时时间到15秒）
+            const timeout = setTimeout(() => {
+                document.removeEventListener('monaco-ready', onMonacoReady);
+                console.warn('Monaco Editor 加载超时，将使用备用编辑器');
+                window.useBackupEditor = true;
+                resolve();
+            }, 15000);
         });
     }
 
@@ -127,29 +238,39 @@ class EditorManager {
         });
 
         // 光标位置变化监听
-        this.editor.onDidChangeCursorPosition((e) => {
-            this.updateCursorPosition(e.position);
-        });
+        if (this.editor.onDidChangeCursorPosition) {
+            this.editor.onDidChangeCursorPosition((e) => {
+                this.updateCursorPosition(e.position);
+            });
+        }
 
         // 焦点变化监听
-        this.editor.onDidFocusEditorText(() => {
-            this.onEditorFocus();
-        });
+        if (this.editor.onDidFocusEditorText) {
+            this.editor.onDidFocusEditorText(() => {
+                this.onEditorFocus();
+            });
+        }
 
-        this.editor.onDidBlurEditorText(() => {
-            this.onEditorBlur();
-        });
+        if (this.editor.onDidBlurEditorText) {
+            this.editor.onDidBlurEditorText(() => {
+                this.onEditorBlur();
+            });
+        }
 
         // 键盘事件监听
-        this.editor.onKeyDown((e) => {
-            this.handleKeyDown(e);
-        });
+        if (this.editor.onKeyDown) {
+            this.editor.onKeyDown((e) => {
+                this.handleKeyDown(e);
+            });
+        }
     }
 
     /**
      * 设置 JSON 验证
      */
     setupJSONValidation() {
+        if (this.useBackupEditor || !window.monaco) return;
+        
         // 配置 JSON 语言特性
         monaco.languages.json.jsonDefaults.setDiagnosticsOptions({
             validate: true,
@@ -182,7 +303,7 @@ class EditorManager {
      * 内容变化处理
      */
     onContentChange() {
-        const newContent = this.editor.getValue();
+        const newContent = this.getValue();
         this.isModified = newContent !== this.currentContent;
         
         // 更新状态栏
@@ -219,7 +340,7 @@ class EditorManager {
      * 验证 JSON
      */
     validateJSON() {
-        const content = this.editor.getValue();
+        const content = this.getValue();
         const validation = Utils.validateJSON(content);
         
         if (validation.valid) {
@@ -313,26 +434,7 @@ class EditorManager {
             e.preventDefault();
             this.dispatchEvent('save');
         }
-        // Ctrl+O / Cmd+O - 打开
-        else if ((e.ctrlKey || e.metaKey) && e.code === 'KeyO') {
-            e.preventDefault();
-            this.dispatchEvent('load');
-        }
-        // Ctrl+U / Cmd+U - 上传
-        else if ((e.ctrlKey || e.metaKey) && e.code === 'KeyU') {
-            e.preventDefault();
-            this.dispatchEvent('upload');
-        }
-        // Ctrl+D / Cmd+D - 下载
-        else if ((e.ctrlKey || e.metaKey) && e.code === 'KeyD') {
-            e.preventDefault();
-            this.dispatchEvent('download');
-        }
-        // F11 - 全屏
-        else if (e.code === 'F11') {
-            e.preventDefault();
-            this.dispatchEvent('toggleFullscreen');
-        }
+        // 其他快捷键...
     }
 
     /**
@@ -416,7 +518,7 @@ class EditorManager {
      * 切换主题
      */
     setTheme(theme) {
-        if (this.editor) {
+        if (this.editor && !this.useBackupEditor && window.monaco) {
             const monacoTheme = theme === 'light' ? 'vs' : theme === 'high-contrast' ? 'hc-black' : 'vs-dark';
             monaco.editor.setTheme(monacoTheme);
         }
@@ -432,62 +534,8 @@ class EditorManager {
             
             // 重新调整编辑器大小
             setTimeout(() => {
-                if (this.editor) {
-                    this.editor.layout();
-                }
+                this.resize();
             }, 100);
-        }
-    }
-
-    /**
-     * 查找文本
-     */
-    find() {
-        if (this.editor) {
-            this.editor.trigger('find', 'actions.find');
-        }
-    }
-
-    /**
-     * 替换文本
-     */
-    replace() {
-        if (this.editor) {
-            this.editor.trigger('replace', 'editor.action.startFindReplaceAction');
-        }
-    }
-
-    /**
-     * 跳转到指定行
-     */
-    goToLine(lineNumber) {
-        if (this.editor) {
-            this.editor.setPosition({ lineNumber, column: 1 });
-            this.editor.revealLine(lineNumber);
-        }
-    }
-
-    /**
-     * 获取选中文本
-     */
-    getSelectedText() {
-        if (this.editor) {
-            const selection = this.editor.getSelection();
-            return this.editor.getModel().getValueInRange(selection);
-        }
-        return '';
-    }
-
-    /**
-     * 插入文本
-     */
-    insertText(text) {
-        if (this.editor) {
-            const position = this.editor.getPosition();
-            this.editor.executeEdits('insert-text', [{
-                range: new monaco.Range(position.lineNumber, position.column, position.lineNumber, position.column),
-                text: text
-            }]);
         }
     }
 
@@ -495,7 +543,7 @@ class EditorManager {
      * 调整编辑器大小
      */
     resize() {
-        if (this.editor) {
+        if (this.editor && this.editor.layout) {
             this.editor.layout();
         }
     }
@@ -504,7 +552,7 @@ class EditorManager {
      * 销毁编辑器
      */
     dispose() {
-        if (this.editor) {
+        if (this.editor && this.editor.dispose) {
             this.editor.dispose();
             this.editor = null;
         }
