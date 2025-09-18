@@ -1,0 +1,287 @@
+/* ==========================================================================
+   Luna TV 配置编辑器 - 主题样式
+   ========================================================================== */
+
+/* CSS变量定义 */
+:root {
+    /* 基础颜色 */
+    --primary-color: #4a90e2;
+    --primary-color-dark: #357abd;
+    --primary-color-light: #6ba3e7;
+    
+    --success-color: #22c55e;
+    --success-color-dark: #16a34a;
+    --success-color-light: #4ade80;
+    
+    --error-color: #ef4444;
+    --error-color-dark: #dc2626;
+    --error-color-light: #f87171;
+    
+    --warning-color: #f59e0b;
+    --warning-color-dark: #d97706;
+    --warning-color-light: #fbbf24;
+    
+    --info-color: #06b6d4;
+    --info-color-dark: #0891b2;
+    --info-color-light: #22d3ee;
+    
+    --secondary-color: #6b7280;
+    --secondary-color-dark: #4b5563;
+    --secondary-color-light: #9ca3af;
+}
+
+/* 深色主题（默认） */
+.theme-dark {
+    --bg-color: #0f0f0f;
+    --panel-bg: #1a1a1a;
+    --header-bg: #141414;
+    --hover-bg: #2a2a2a;
+    
+    --text-color: #e5e5e5;
+    --text-muted: #a3a3a3;
+    --text-secondary: #737373;
+    
+    --border-color: #333333;
+    --border-light: #404040;
+    --border-dark: #262626;
+    
+    --input-bg: #1f1f1f;
+    --code-bg: #171717;
+    --code-color: #e5e5e5;
+    
+    --kbd-bg: #262626;
+    
+    --scrollbar-track: #1a1a1a;
+    --scrollbar-thumb: #404040;
+    --scrollbar-thumb-hover: #525252;
+    
+    --selection-bg: #4a90e2;
+    --selection-color: #ffffff;
+    
+    --shadow-color: rgba(0, 0, 0, 0.5);
+    --backdrop-color: rgba(0, 0, 0, 0.8);
+}
+
+/* 浅色主题 */
+.theme-light {
+    --bg-color: #ffffff;
+    --panel-bg: #f9fafb;
+    --header-bg: #f3f4f6;
+    --hover-bg: #f3f4f6;
+    
+    --text-color: #111827;
+    --text-muted: #6b7280;
+    --text-secondary: #9ca3af;
+    
+    --border-color: #d1d5db;
+    --border-light: #e5e7eb;
+    --border-dark: #9ca3af;
+    
+    --input-bg: #ffffff;
+    --code-bg: #f3f4f6;
+    --code-color: #111827;
+    
+    --kbd-bg: #f9fafb;
+    
+    --scrollbar-track: #f3f4f6;
+    --scrollbar-thumb: #d1d5db;
+    --scrollbar-thumb-hover: #9ca3af;
+    
+    --selection-bg: #4a90e2;
+    --selection-color: #ffffff;
+    
+    --shadow-color: rgba(0, 0, 0, 0.1);
+    --backdrop-color: rgba(0, 0, 0, 0.5);
+}
+
+/* 高对比度主题 */
+.theme-high-contrast {
+    --bg-color: #000000;
+    --panel-bg: #000000;
+    --header-bg: #1a1a1a;
+    --hover-bg: #333333;
+    
+    --text-color: #ffffff;
+    --text-muted: #cccccc;
+    --text-secondary: #999999;
+    
+    --border-color: #666666;
+    --border-light: #777777;
+    --border-dark: #444444;
+    
+    --input-bg: #1a1a1a;
+    --code-bg: #0a0a0a;
+    --code-color: #ffffff;
+    
+    --kbd-bg: #333333;
+    
+    --primary-color: #66b3ff;
+    --success-color: #66ff66;
+    --error-color: #ff6666;
+    --warning-color: #ffcc66;
+    --info-color: #66ccff;
+    
+    --scrollbar-track: #1a1a1a;
+    --scrollbar-thumb: #666666;
+    --scrollbar-thumb-hover: #888888;
+    
+    --selection-bg: #66b3ff;
+    --selection-color: #000000;
+    
+    --shadow-color: rgba(255, 255, 255, 0.2);
+    --backdrop-color: rgba(0, 0, 0, 0.9);
+}
+
+/* 蓝色主题 */
+.theme-blue {
+    --primary-color: #2563eb;
+    --primary-color-dark: #1d4ed8;
+    --primary-color-light: #3b82f6;
+    
+    --bg-color: #0f172a;
+    --panel-bg: #1e293b;
+    --header-bg: #164566;
+    --hover-bg: #334155;
+    
+    --text-color: #f1f5f9;
+    --text-muted: #cbd5e1;
+    --text-secondary: #94a3b8;
+    
+    --border-color: #334155;
+    --border-light: #475569;
+    --border-dark: #1e293b;
+    
+    --input-bg: #1e293b;
+    --code-bg: #0f172a;
+    --code-color: #f1f5f9;
+}
+
+/* 紫色主题 */
+.theme-purple {
+    --primary-color: #7c3aed;
+    --primary-color-dark: #6d28d9;
+    --primary-color-light: #8b5cf6;
+    
+    --bg-color: #1e1b4b;
+    --panel-bg: #312e81;
+    --header-bg: #3730a3;
+    --hover-bg: #4338ca;
+    
+    --text-color: #e0e7ff;
+    --text-muted: #c7d2fe;
+    --text-secondary: #a5b4fc;
+    
+    --border-color: #4338ca;
+    --border-light: #5b21b6;
+    --border-dark: #312e81;
+    
+    --input-bg: #312e81;
+    --code-bg: #1e1b4b;
+    --code-color: #e0e7ff;
+}
+
+/* 绿色主题 */
+.theme-green {
+    --primary-color: #059669;
+    --primary-color-dark: #047857;
+    --primary-color-light: #10b981;
+    
+    --bg-color: #064e3b;
+    --panel-bg: #065f46;
+    --header-bg: #047857;
+    --hover-bg: #059669;
+    
+    --text-color: #d1fae5;
+    --text-muted: #a7f3d0;
+    --text-secondary: #6ee7b7;
+    
+    --border-color: #059669;
+    --border-light: #10b981;
+    --border-dark: #065f46;
+    
+    --input-bg: #065f46;
+    --code-bg: #064e3b;
+    --code-color: #d1fae5;
+}
+
+/* 主题切换动画 */
+.theme-transition * {
+    transition: background-color 0.3s ease, 
+                color 0.3s ease, 
+                border-color 0.3s ease,
+                box-shadow 0.3s ease !important;
+}
+
+/* Monaco编辑器主题适配 */
+.theme-dark .monaco-editor {
+    background: var(--code-bg) !important;
+}
+
+.theme-light .monaco-editor {
+    background: var(--code-bg) !important;
+}
+
+.theme-high-contrast .monaco-editor {
+    background: var(--code-bg) !important;
+}
+
+/* 自定义滚动条适配不同主题 */
+.theme-light ::-webkit-scrollbar-thumb {
+    background: #d1d5db;
+}
+
+.theme-light ::-webkit-scrollbar-thumb:hover {
+    background: #9ca3af;
+}
+
+.theme-high-contrast ::-webkit-scrollbar-thumb {
+    background: #666666;
+    border: 1px solid #888888;
+}
+
+/* 打印样式主题适配 */
+@media print {
+    .theme-dark,
+    .theme-light,
+    .theme-high-contrast,
+    .theme-blue,
+    .theme-purple,
+    .theme-green {
+        --bg-color: white !important;
+        --text-color: black !important;
+        --border-color: #ccc !important;
+        --code-bg: #f5f5f5 !important;
+        --code-color: black !important;
+    }
+}
+
+/* 无障碍访问增强 */
+@media (prefers-reduced-motion: reduce) {
+    .theme-transition * {
+        transition: none !important;
+    }
+}
+
+@media (prefers-contrast: high) {
+    :root {
+        --border-color: #000000 !important;
+        --text-color: #000000 !important;
+        --bg-color: #ffffff !important;
+    }
+    
+    .theme-dark {
+        --border-color: #ffffff !important;
+        --text-color: #ffffff !important;
+        --bg-color: #000000 !important;
+    }
+}
+
+/* 色盲友好配色 */
+.theme-colorblind-friendly {
+    --primary-color: #0173b2;
+    --success-color: #029e73;
+    --error-color: #cc78bc;
+    --warning-color: #ece133;
+    --info-color: #56b4e9;
+    --secondary-color: #de8f05;
+}
