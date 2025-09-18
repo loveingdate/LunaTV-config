@@ -1,0 +1,112 @@
+{
+    "name": "Luna TV 配置编辑器",
+    "short_name": "Luna TV Editor",
+    "description": "专业的 JSON 配置文件编辑器，专为 Luna TV 配置管理而设计",
+    "version": "2.0.0",
+    "start_url": "/index.html",
+    "display": "standalone",
+    "orientation": "any",
+    "theme_color": "#007bff",
+    "background_color": "#1e1e1e",
+    "scope": "/",
+    "lang": "zh-CN",
+    "dir": "ltr",
+    "prefer_related_applications": false,
+    "icons": [
+        {
+            "src": "data:image/svg+xml,<svg xmlns='220 viewBox='0 0 192 192'><rect width='192' height='192' fill='%23007bff' rx='32'/><text x='96' y='130' text-anchor='middle' font-size='120' fill='white'>🌙</text></svg>",
+            "sizes": "192x192",
+            "type": "image/svg+xml",
+            "purpose": "any maskable"
+        },
+        {
+            "src": "data:image/svg+xml,<svg xmlns='221 viewBox='0 0 512 512'><rect width='512' height='512' fill='%23007bff' rx='64'/><text x='256' y='340' text-anchor='middle' font-size='300' fill='white'>🌙</text></svg>",
+            "sizes": "512x512",
+            "type": "image/svg+xml",
+            "purpose": "any"
+        }
+    ],
+    "screenshots": [
+        {
+            "src": "data:image/svg+xml,<svg xmlns='222 viewBox='0 0 1280 800'><rect width='1280' height='800' fill='%23f8f9fa'/><rect x='0' y='0' width='1280' height='60' fill='%23007bff'/><text x='640' y='35' text-anchor='middle' font-size='20' fill='white'>Luna TV 配置编辑器</text><rect x='20' y='80' width='200' height='700' fill='%23e9ecef' rx='8'/><rect x='240' y='80' width='800' height='700' fill='white' rx='8'/><rect x='1060' y='80' width='200' height='700' fill='%23e9ecef' rx='8'/></svg>",
+            "sizes": "1280x800",
+            "type": "image/svg+xml",
+            "form_factor": "wide",
+            "label": "桌面端界面"
+        },
+        {
+            "src": "data:image/svg+xml,<svg xmlns='223 viewBox='0 0 390 844'><rect width='390' height='844' fill='%23f8f9fa'/><rect x='0' y='0' width='390' height='60' fill='%23007bff'/><text x='195' y='35' text-anchor='middle' font-size='16' fill='white'>Luna TV Editor</text><rect x='10' y='70' width='370' height='764' fill='white' rx='8'/></svg>",
+            "sizes": "390x844",
+            "type": "image/svg+xml",
+            "form_factor": "narrow",
+            "label": "移动端界面"
+        }
+    ],
+    "categories": [
+        "productivity",
+        "developer",
+        "utilities"
+    ],
+    "shortcuts": [
+        {
+            "name": "新建配置",
+            "short_name": "新建",
+            "description": "创建新的JSON配置文件",
+            "url": "/index.html?action=new",
+            "icons": [
+                {
+                    "src": "data:image/svg+xml,<svg xmlns='224 viewBox='0 0 96 96'><rect width='96' height='96' fill='%2328a745' rx='16'/><text x='48' y='60' text-anchor='middle' font-size='48' fill='white'>+</text></svg>",
+                    "sizes": "96x96",
+                    "type": "image/svg+xml"
+                }
+            ]
+        },
+        {
+            "name": "GitHub 仓库",
+            "short_name": "GitHub",
+            "description": "访问 Luna TV 配置仓库",
+            "url": "https://github.com/hafrey1/LunaTV-config",
+            "icons": [
+                {
+                    "src": "data:image/svg+xml,<svg xmlns='225 viewBox='0 0 96 96'><rect width='96' height='96' fill='%23333' rx='16'/><text x='48' y='60' text-anchor='middle' font-size='40' fill='white'>🐙</text></svg>",
+                    "sizes": "96x96",
+                    "type": "image/svg+xml"
+                }
+            ]
+        }
+    ],
+    "share_target": {
+        "action": "/index.html",
+        "method": "GET",
+        "params": {
+            "title": "title",
+            "text": "text",
+            "url": "url"
+        }
+    },
+    "file_handlers": [
+        {
+            "action": "/index.html",
+            "accept": {
+                "application/json": [".json"]
+            }
+        }
+    ],
+    "protocol_handlers": [
+        {
+            "protocol": "web+lunatv",
+            "url": "/index.html?config=%s"
+        }
+    ],
+    "edge_side_panel": {
+        "preferred_width": 400
+    },
+    "display_override": [
+        "window-controls-overlay",
+        "standalone",
+        "minimal-ui"
+    ],
+    "related_applications": [],
+    "iarc_rating_id": "",
+    "handle_links": "preferred"
+}
