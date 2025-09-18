@@ -53,7 +53,7 @@
             line-height: 1.6;
         }
         
-        /* 应用容器布局优化 */
+        /* 应用容器布局 */
         .app-container {
             height: 100vh;
             display: grid;
@@ -74,6 +74,12 @@
             width: 100vw; height: 100vh;
             z-index: 9999;
             background: var(--bg-primary);
+            display: grid;
+            grid-template-columns: 1fr;
+            grid-template-rows: auto 1fr;
+            grid-template-areas: 
+                "fullscreen-toolbar"
+                "fullscreen-main";
         }
         
         .fullscreen .header,
@@ -83,8 +89,27 @@
             display: none;
         }
         
+        /* 全屏工具栏 */
+        .fullscreen-toolbar {
+            grid-area: fullscreen-toolbar;
+            background: var(--bg-secondary);
+            border-bottom: 2px solid var(--primary-blue);
+            padding: 8px 16px;
+            display: none;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .fullscreen .fullscreen-toolbar {
+            display: flex;
+        }
+        
+        .fullscreen-main {
+            grid-area: fullscreen-main;
+        }
+        
         .fullscreen .main-content {
-            grid-area: 1 / 1 / -1 / -1;
+            grid-area: fullscreen-main;
         }
         
         /* 头部样式 */
@@ -267,6 +292,22 @@
             font-size: 16px;
         }
         
+        /* JSON文件选择器 */
+        .json-selector {
+            position: relative;
+            margin-right: 12px;
+        }
+        
+        .json-selector select {
+            padding: 8px 12px;
+            border: 2px solid var(--border-color);
+            border-radius: var(--border-radius);
+            background: var(--bg-card);
+            color: var(--text-primary);
+            font-size: 14px;
+            min-width: 200px;
+        }
+        
         /* Token 输入区 */
         .token-section {
             grid-area: token;
@@ -357,6 +398,16 @@
             position: relative;
         }
         
+        .editor-header {
+            background: var(--bg-tertiary);
+            padding: 8px 12px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12px;
+        }
+        
         .editor {
             flex: 1;
             background: var(--bg-primary);
@@ -367,13 +418,38 @@
             padding: 16px;
             color: var(--text-primary);
             line-height: 1.6;
+            font-size: 14px;
         }
         
-        /* 侧边面板 */
-        .side-panel {
+        /* 查找栏 */
+        .search-bar {
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-color);
+            padding: 8px 12px;
+            display: none;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+        }
+        
+        .search-bar input {
+            flex: 1;
+            padding: 4px 8px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+        }
+        
+        .search-info {
+            color: var(--text-muted);
+            font-size: 11px;
+        }
+        
+        /* 侧边栏（树状视图和历史记录） */
+        .sidebar {
             width: 350px;
             background: var(--bg-card);
-            border-left: 3px solid var(--primary-blue);
             display: flex;
             flex-direction: column;
             margin: 8px 8px 8px 0;
@@ -382,25 +458,51 @@
             overflow: hidden;
         }
         
-        .panel-header {
-            background: var(--gradient-primary);
-            color: white;
-            padding: 16px 20px;
+        .sidebar-tabs {
             display: flex;
-            justify-content: space-between;
-            align-items: center;
+            background: var(--bg-tertiary);
         }
         
-        .panel-content {
+        .sidebar-tab {
+            flex: 1;
+            padding: 12px 16px;
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 13px;
+        }
+        
+        .sidebar-tab.active {
+            background: var(--gradient-primary);
+            color: white;
+        }
+        
+        .sidebar-content {
             flex: 1;
             overflow: auto;
             padding: 16px;
         }
         
+        .sidebar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+        
+        /* JSON树状视图 */
         .json-tree {
             font-family: 'Monaco', 'Menlo', 'Courier New', monospace;
             font-size: 13px;
             line-height: 1.6;
+        }
+        
+        .tree-controls {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 12px;
         }
         
         .tree-node {
@@ -409,6 +511,7 @@
             border-radius: 3px;
             transition: var(--transition);
             cursor: pointer;
+            user-select: none;
         }
         
         .tree-node:hover {
@@ -450,9 +553,62 @@
             margin-right: 4px;
         }
         
+        .tree-toggle.expanded::before {
+            content: '▼';
+        }
+        
+        .tree-toggle.collapsed::before {
+            content: '▶';
+        }
+        
         .tree-indent {
             display: inline-block;
             width: 20px;
+        }
+        
+        .tree-children {
+            margin-left: 20px;
+        }
+        
+        .tree-children.collapsed {
+            display: none;
+        }
+        
+        /* 历史记录样式 */
+        .history-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .history-item {
+            padding: 8px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 12px;
+        }
+        
+        .history-item:hover {
+            background: var(--bg-tertiary);
+            border-color: var(--primary-blue);
+        }
+        
+        .history-time {
+            color: var(--text-muted);
+            font-size: 11px;
+            margin-top: 4px;
+        }
+        
+        .history-content {
+            font-family: monospace;
+            font-size: 11px;
+            color: var(--text-secondary);
+            margin-top: 4px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
         
         /* 状态栏 */
@@ -597,112 +753,13 @@
         .toast.warning { background: linear-gradient(135deg, var(--primary-orange), #ffc107); }
         .toast.info { background: var(--gradient-primary); }
         
-        /* 历史记录面板 */
-        .history-panel {
-            position: fixed;
-            right: 20px;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 300px;
-            max-height: 400px;
-            background: var(--bg-card);
-            border: 1px solid var(--border-color);
-            border-radius: var(--border-radius);
-            box-shadow: var(--shadow-lg);
-            z-index: 1000;
-            display: none;
-        }
-        
-        .history-header {
-            padding: 12px 16px;
-            background: var(--bg-tertiary);
-            border-bottom: 1px solid var(--border-color);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        
-        .history-list {
-            max-height: 300px;
-            overflow-y: auto;
-        }
-        
-        .history-item {
-            padding: 8px 16px;
-            border-bottom: 1px solid var(--border-color);
-            cursor: pointer;
-            transition: var(--transition);
-            font-size: 12px;
-        }
-        
-        .history-item:hover {
-            background: var(--bg-tertiary);
-        }
-        
-        .history-time {
-            color: var(--text-muted);
-            font-size: 11px;
-        }
-        
-        /* 模态框 */
-        .modal-overlay {
-            position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            background: rgba(0,0,0,0.6);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 2000;
-            backdrop-filter: blur(5px);
-        }
-        
-        .modal {
-            background: var(--bg-card);
-            border-radius: 12px;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
-            max-width: 500px;
-            width: 90%;
-            max-height: 80vh;
-            overflow: hidden;
-            animation: modalSlideIn 0.3s ease-out;
-        }
-        
-        @keyframes modalSlideIn {
-            from { opacity: 0; transform: translateY(-20px) scale(0.95); }
-            to { opacity: 1; transform: translateY(0) scale(1); }
-        }
-        
-        .modal-header {
-            background: var(--gradient-primary);
-            color: white;
-            padding: 16px 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        
-        .modal-body {
-            padding: 20px;
-            max-height: 60vh;
-            overflow-y: auto;
-        }
-        
-        .modal-footer {
-            padding: 16px 20px;
-            border-top: 1px solid var(--border-color);
-            display: flex;
-            justify-content: flex-end;
-            gap: 12px;
-        }
-        
         /* 响应式设计 */
         @media (max-width: 768px) {
             .app-title { font-size: 16px; }
             .header { padding: 12px 16px; }
-            .toolbar { padding: 8px 16px; }
+            .toolbar { padding: 8px 16px; flex-wrap: wrap; }
             .token-section { padding: 12px 16px; }
-            .side-panel { 
+            .sidebar { 
                 width: 100%; 
                 position: fixed; 
                 top: 0; right: 0; bottom: 0; 
@@ -715,6 +772,7 @@
             }
             .toolbar-section {
                 flex-wrap: wrap;
+                gap: 4px;
             }
         }
         
@@ -746,17 +804,33 @@
             </div>
             
             <div class="header-right">
-                <button class="btn btn-icon" id="history-btn" title="历史记录">📚</button>
                 <button class="btn btn-icon" id="theme-toggle" title="切换主题">🌓</button>
                 <button class="btn btn-icon" id="fullscreen-toggle" title="全屏模式">⛶</button>
                 <button class="btn btn-primary" id="save-btn" title="保存到 GitHub">💾 保存</button>
             </div>
         </header>
 
+        <!-- 全屏工具栏 -->
+        <div class="fullscreen-toolbar">
+            <div class="toolbar-section">
+                <button class="btn btn-outline" id="fullscreen-format-btn">🔧 格式化</button>
+                <button class="btn btn-outline" id="fullscreen-validate-btn">✅ 验证</button>
+                <button class="btn btn-outline" id="fullscreen-find-btn">🔍 查找</button>
+            </div>
+            <div class="toolbar-section">
+                <button class="btn btn-icon" id="exit-fullscreen-btn" title="退出全屏">🗗</button>
+            </div>
+        </div>
+
         <!-- 工具栏 -->
         <nav class="toolbar">
             <div class="toolbar-section">
-                <button class="btn btn-secondary" id="load-btn">📥 加载配置</button>
+                <div class="json-selector">
+                    <select id="json-file-select">
+                        <option value="">选择JSON文件...</option>
+                    </select>
+                </div>
+                <button class="btn btn-secondary" id="refresh-files-btn">🔄 刷新</button>
                 <button class="btn btn-secondary" id="upload-btn">📤 上传文件</button>
                 <button class="btn btn-secondary" id="download-btn">📥 下载文件</button>
             </div>
@@ -806,6 +880,22 @@
         <!-- 主编辑区 -->
         <main class="main-content">
             <div class="editor-container">
+                <div class="editor-header">
+                    <span id="current-file">新建文件</span>
+                    <div class="editor-actions">
+                        <button class="btn btn-outline btn-sm" id="editor-find-btn" title="在编辑器中查找 (Ctrl+F)">🔍</button>
+                    </div>
+                </div>
+                
+                <!-- 查找栏 -->
+                <div class="search-bar" id="search-bar">
+                    <input type="text" id="search-input" placeholder="查找内容...">
+                    <button class="btn btn-outline btn-sm" id="search-prev">↑</button>
+                    <button class="btn btn-outline btn-sm" id="search-next">↓</button>
+                    <span class="search-info" id="search-info">0/0</span>
+                    <button class="btn btn-outline btn-sm" id="search-close">✕</button>
+                </div>
+                
                 <textarea id="monaco-editor" class="editor" placeholder="请输入JSON配置文件内容...">{
   "sites": [],
   "wallpaper": "",
@@ -825,14 +915,37 @@
                 </div>
             </div>
 
-            <!-- 侧边面板 -->
-            <aside class="side-panel" id="side-panel" style="display: none;">
-                <div class="panel-header">
-                    <h3>JSON 树状视图</h3>
-                    <button class="btn btn-icon" id="close-panel" style="color: white;">✕</button>
+            <!-- 侧边栏 -->
+            <aside class="sidebar" id="sidebar" style="display: none;">
+                <div class="sidebar-tabs">
+                    <button class="sidebar-tab active" data-tab="tree">📊 树状图</button>
+                    <button class="sidebar-tab" data-tab="history">📚 历史</button>
                 </div>
-                <div class="panel-content">
-                    <div id="json-tree" class="json-tree"></div>
+                
+                <div class="sidebar-content">
+                    <!-- 树状图视图 -->
+                    <div id="tree-tab-content" class="tab-content">
+                        <div class="sidebar-header">
+                            <h4>JSON 树状视图</h4>
+                            <button class="btn btn-icon" id="close-sidebar">✕</button>
+                        </div>
+                        <div class="tree-controls">
+                            <button class="btn btn-outline btn-sm" id="expand-all">🔽 全部展开</button>
+                            <button class="btn btn-outline btn-sm" id="collapse-all">🔼 全部折叠</button>
+                        </div>
+                        <div id="json-tree" class="json-tree"></div>
+                    </div>
+                    
+                    <!-- 历史记录视图 -->
+                    <div id="history-tab-content" class="tab-content" style="display: none;">
+                        <div class="sidebar-header">
+                            <h4>📚 历史记录</h4>
+                            <button class="btn btn-outline btn-sm" id="clear-history">🗑️ 清除</button>
+                        </div>
+                        <div class="history-list" id="history-list">
+                            <!-- 动态生成历史记录 -->
+                        </div>
+                    </div>
                 </div>
             </aside>
         </main>
@@ -853,36 +966,8 @@
         </footer>
     </div>
 
-    <!-- 历史记录面板 -->
-    <div id="history-panel" class="history-panel">
-        <div class="history-header">
-            <h4>📚 历史记录</h4>
-            <button class="btn btn-icon" id="close-history">✕</button>
-        </div>
-        <div class="history-list" id="history-list">
-            <!-- 动态生成历史记录 -->
-        </div>
-    </div>
-
     <!-- Toast通知容器 -->
     <div id="toast-container" class="toast-container"></div>
-
-    <!-- 模态框 -->
-    <div id="modal-overlay" class="modal-overlay" style="display: none;">
-        <div class="modal">
-            <div class="modal-header">
-                <h3 id="modal-title">标题</h3>
-                <button class="btn btn-icon" id="modal-close">✕</button>
-            </div>
-            <div class="modal-body" id="modal-body">
-                <!-- 动态内容 -->
-            </div>
-            <div class="modal-footer">
-                <button class="btn btn-secondary" id="modal-cancel">取消</button>
-                <button class="btn btn-primary" id="modal-confirm">确定</button>
-            </div>
-        </div>
-    </div>
 
     <!-- 隐藏的文件输入 -->
     <input type="file" id="file-input" accept=".json" style="display: none;">
@@ -899,6 +984,11 @@
                 this.autoSaveInterval = null;
                 this.lastContent = '';
                 this.isFullscreen = false;
+                this.jsonFiles = [];
+                this.currentFile = null;
+                this.searchMatches = [];
+                this.currentSearchIndex = -1;
+                this.sidebarTab = 'tree';
             }
             
             init() {
@@ -907,6 +997,7 @@
                 this.loadSettings();
                 this.startAutoSave();
                 this.updateStatus();
+                this.loadJSONFiles();
                 console.log('🌙 Luna TV 配置编辑器已启动');
             }
             
@@ -921,10 +1012,12 @@
                 // 编辑器事件
                 editor.addEventListener('input', () => this.onContentChange());
                 editor.addEventListener('keydown', (e) => this.handleKeyDown(e));
+                editor.addEventListener('scroll', () => this.updateCursorPosition());
+                editor.addEventListener('click', () => this.updateCursorPosition());
                 
                 // 按钮事件
                 document.getElementById('save-btn').onclick = () => this.saveToGitHub();
-                document.getElementById('load-btn').onclick = () => this.loadFromGitHub();
+                document.getElementById('refresh-files-btn').onclick = () => this.loadJSONFiles();
                 document.getElementById('upload-btn').onclick = () => this.uploadFile();
                 document.getElementById('download-btn').onclick = () => this.downloadFile();
                 
@@ -933,15 +1026,22 @@
                 document.getElementById('validate-btn').onclick = () => this.validateJSON();
                 document.getElementById('copy-btn').onclick = () => this.copyToClipboard();
                 document.getElementById('find-btn').onclick = () => this.showFind();
+                document.getElementById('editor-find-btn').onclick = () => this.showFind();
                 
                 document.getElementById('undo-btn').onclick = () => this.undo();
                 document.getElementById('redo-btn').onclick = () => this.redo();
                 
                 document.getElementById('theme-toggle').onclick = () => this.toggleTheme();
                 document.getElementById('fullscreen-toggle').onclick = () => this.toggleFullscreen();
-                document.getElementById('history-btn').onclick = () => this.toggleHistory();
+                document.getElementById('exit-fullscreen-btn').onclick = () => this.toggleFullscreen();
+                
+                // 全屏工具栏按钮
+                document.getElementById('fullscreen-format-btn').onclick = () => this.formatJSON();
+                document.getElementById('fullscreen-validate-btn').onclick = () => this.validateJSON();
+                document.getElementById('fullscreen-find-btn').onclick = () => this.showFind();
                 
                 document.getElementById('view-mode').onchange = (e) => this.changeViewMode(e.target.value);
+                document.getElementById('json-file-select').onchange = (e) => this.selectJSONFile(e.target.value);
                 
                 // GitHub连接
                 document.getElementById('connect-btn').onclick = () => this.connectGitHub();
@@ -952,11 +1052,41 @@
                 
                 // 关闭按钮
                 document.getElementById('close-error').onclick = () => this.hideError();
-                document.getElementById('close-panel').onclick = () => this.closeSidePanel();
-                document.getElementById('close-history').onclick = () => this.closeHistory();
+                document.getElementById('close-sidebar').onclick = () => this.closeSidebar();
                 
                 // 文件输入
                 document.getElementById('file-input').onchange = (e) => this.handleFileUpload(e);
+                
+                // 侧边栏标签
+                document.querySelectorAll('.sidebar-tab').forEach(tab => {
+                    tab.onclick = () => this.switchSidebarTab(tab.dataset.tab);
+                });
+                
+                // 树状图控制
+                document.getElementById('expand-all').onclick = () => this.expandAllTree();
+                document.getElementById('collapse-all').onclick = () => this.collapseAllTree();
+                
+                // 历史记录
+                document.getElementById('clear-history').onclick = () => this.clearHistory();
+                
+                // 查找功能
+                document.getElementById('search-input').addEventListener('input', (e) => this.performSearch(e.target.value));
+                document.getElementById('search-prev').onclick = () => this.searchPrevious();
+                document.getElementById('search-next').onclick = () => this.searchNext();
+                document.getElementById('search-close').onclick = () => this.hideFind();
+                
+                // 查找栏按键
+                document.getElementById('search-input').addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter') {
+                        if (e.shiftKey) {
+                            this.searchPrevious();
+                        } else {
+                            this.searchNext();
+                        }
+                    } else if (e.key === 'Escape') {
+                        this.hideFind();
+                    }
+                });
             }
             
             onContentChange() {
@@ -998,6 +1128,102 @@
                 if (e.key === 'F11') {
                     e.preventDefault();
                     this.toggleFullscreen();
+                }
+                
+                if (e.key === 'Escape') {
+                    this.hideFind();
+                }
+            }
+            
+            // JSON文件管理
+            async loadJSONFiles() {
+                if (!this.isConnected) {
+                    // 演示模式的样例文件
+                    this.jsonFiles = [
+                        { name: 'config.json', path: 'config.json' },
+                        { name: 'tv-sources.json', path: 'tv-sources.json' },
+                        { name: 'settings.json', path: 'settings.json' }
+                    ];
+                } else {
+                    try {
+                        // 实际应该调用GitHub API获取仓库根目录的所有JSON文件
+                        // 这里使用模拟数据
+                        this.jsonFiles = [
+                            { name: 'luna-tv-config.json', path: 'luna-tv-config.json' },
+                            { name: 'backup-config.json', path: 'backup-config.json' },
+                            { name: 'test-config.json', path: 'test-config.json' }
+                        ];
+                    } catch (error) {
+                        this.showToast('加载JSON文件列表失败: ' + error.message, 'error');
+                        return;
+                    }
+                }
+                
+                this.updateFileSelector();
+            }
+            
+            updateFileSelector() {
+                const select = document.getElementById('json-file-select');
+                select.innerHTML = '<option value="">选择JSON文件...</option>';
+                
+                this.jsonFiles.forEach(file => {
+                    const option = document.createElement('option');
+                    option.value = file.path;
+                    option.textContent = file.name;
+                    select.appendChild(option);
+                });
+            }
+            
+            async selectJSONFile(filePath) {
+                if (!filePath) return;
+                
+                try {
+                    this.currentFile = filePath;
+                    document.getElementById('current-file').textContent = filePath;
+                    
+                    // 模拟加载文件内容
+                    const sampleConfigs = {
+                        'luna-tv-config.json': {
+                            "sites": [
+                                {
+                                    "key": "csp_XYQHiker",
+                                    "name": "香雅情",
+                                    "type": 3,
+                                    "api": "csp_XYQHiker",
+                                    "searchable": 1,
+                                    "quickSearch": 1,
+                                    "filterable": 1
+                                }
+                            ],
+                            "wallpaper": "https://picsum.photos/1920/1080",
+                            "spider": "https://raw.githubusercontent.com/user/repo/main/spider.jar",
+                            "warningText": "本应用仅供学习交流使用",
+                            "disclaimer": "免责声明内容",
+                            "version": "1.2.0"
+                        },
+                        'tv-sources.json': {
+                            "sources": [
+                                { "name": "CCTV-1", "url": "186" },
+                                { "name": "CCTV-2", "url": "187" }
+                            ]
+                        },
+                        'config.json': {
+                            "app_name": "Luna TV",
+                            "version": "2.0.0",
+                            "settings": {
+                                "auto_update": true,
+                                "cache_size": 100
+                            }
+                        }
+                    };
+                    
+                    const content = sampleConfigs[filePath] || { "message": "文件内容" };
+                    document.getElementById('monaco-editor').value = JSON.stringify(content, null, 2);
+                    this.onContentChange();
+                    
+                    this.showToast(`已加载文件: ${filePath}`, 'success');
+                } catch (error) {
+                    this.showToast('加载文件失败: ' + error.message, 'error');
                 }
             }
             
@@ -1059,22 +1285,109 @@
                 }
             }
             
-            // 显示查找
+            // 查找功能
             showFind() {
-                const content = prompt('请输入要查找的内容:');
-                if (content) {
-                    const editor = document.getElementById('monaco-editor');
-                    const text = editor.value;
-                    const index = text.indexOf(content);
-                    
-                    if (index !== -1) {
-                        editor.focus();
-                        editor.setSelectionRange(index, index + content.length);
-                        this.showToast(`找到内容: ${content}`, 'info');
-                    } else {
-                        this.showToast('未找到指定内容', 'warning');
-                    }
+                const searchBar = document.getElementById('search-bar');
+                const searchInput = document.getElementById('search-input');
+                
+                searchBar.style.display = 'flex';
+                searchInput.focus();
+                
+                // 如果有选中文本，自动填入查找框
+                const editor = document.getElementById('monaco-editor');
+                const selectedText = editor.value.substring(editor.selectionStart, editor.selectionEnd);
+                if (selectedText) {
+                    searchInput.value = selectedText;
+                    this.performSearch(selectedText);
                 }
+            }
+            
+            hideFind() {
+                const searchBar = document.getElementById('search-bar');
+                searchBar.style.display = 'none';
+                this.clearSearchHighlight();
+            }
+            
+            performSearch(query) {
+                const editor = document.getElementById('monaco-editor');
+                const content = editor.value;
+                this.searchMatches = [];
+                
+                if (!query) {
+                    this.updateSearchInfo();
+                    this.clearSearchHighlight();
+                    return;
+                }
+                
+                // 查找所有匹配项
+                let index = content.indexOf(query);
+                while (index !== -1) {
+                    this.searchMatches.push({ start: index, end: index + query.length });
+                    index = content.indexOf(query, index + 1);
+                }
+                
+                this.currentSearchIndex = this.searchMatches.length > 0 ? 0 : -1;
+                this.updateSearchInfo();
+                this.highlightSearch();
+                
+                if (this.searchMatches.length > 0) {
+                    this.jumpToSearchMatch(0);
+                }
+            }
+            
+            searchNext() {
+                if (this.searchMatches.length === 0) return;
+                
+                this.currentSearchIndex = (this.currentSearchIndex + 1) % this.searchMatches.length;
+                this.jumpToSearchMatch(this.currentSearchIndex);
+                this.updateSearchInfo();
+            }
+            
+            searchPrevious() {
+                if (this.searchMatches.length === 0) return;
+                
+                this.currentSearchIndex = this.currentSearchIndex === 0 ? 
+                    this.searchMatches.length - 1 : this.currentSearchIndex - 1;
+                this.jumpToSearchMatch(this.currentSearchIndex);
+                this.updateSearchInfo();
+            }
+            
+            jumpToSearchMatch(index) {
+                if (index < 0 || index >= this.searchMatches.length) return;
+                
+                const editor = document.getElementById('monaco-editor');
+                const match = this.searchMatches[index];
+                
+                editor.focus();
+                editor.setSelectionRange(match.start, match.end);
+                
+                // 滚动到可见区域
+                const lines = editor.value.substring(0, match.start).split('\n');
+                const lineNumber = lines.length;
+                const lineHeight = 20; // 估算行高
+                const scrollTop = Math.max(0, (lineNumber - 5) * lineHeight);
+                editor.scrollTop = scrollTop;
+            }
+            
+            updateSearchInfo() {
+                const searchInfo = document.getElementById('search-info');
+                if (this.searchMatches.length === 0) {
+                    searchInfo.textContent = '0/0';
+                } else {
+                    searchInfo.textContent = `${this.currentSearchIndex + 1}/${this.searchMatches.length}`;
+                }
+            }
+            
+            highlightSearch() {
+                // 简化版高亮，实际应该修改编辑器样式
+                // 这里只是更新搜索信息
+                this.updateSearchInfo();
+            }
+            
+            clearSearchHighlight() {
+                this.searchMatches = [];
+                this.currentSearchIndex = -1;
+                this.updateSearchInfo();
             }
             
             // 撤销
@@ -1153,66 +1466,53 @@
                 this.showToast(`已切换到${this.currentTheme === 'dark' ? '深色' : '浅色'}主题`, 'info');
             }
             
-            // 切换历史记录面板
-            toggleHistory() {
-                const panel = document.getElementById('history-panel');
-                const isVisible = panel.style.display === 'block';
-                panel.style.display = isVisible ? 'none' : 'block';
+            // 侧边栏管理
+            switchSidebarTab(tabName) {
+                this.sidebarTab = tabName;
                 
-                if (!isVisible) {
+                // 更新标签状态
+                document.querySelectorAll('.sidebar-tab').forEach(tab => {
+                    tab.classList.toggle('active', tab.dataset.tab === tabName);
+                });
+                
+                // 切换内容
+                document.getElementById('tree-tab-content').style.display = 
+                    tabName === 'tree' ? 'block' : 'none';
+                document.getElementById('history-tab-content').style.display = 
+                    tabName === 'history' ? 'block' : 'none';
+                
+                if (tabName === 'tree') {
+                    this.updateTreeView();
+                } else if (tabName === 'history') {
                     this.updateHistoryPanel();
                 }
-            }
-            
-            closeHistory() {
-                document.getElementById('history-panel').style.display = 'none';
-            }
-            
-            // 更新历史记录面板
-            updateHistoryPanel() {
-                const list = document.getElementById('history-list');
-                list.innerHTML = '';
-                
-                this.history.forEach((content, index) => {
-                    const item = document.createElement('div');
-                    item.className = 'history-item';
-                    item.innerHTML = `
-                        <div>${content.substring(0, 50)}${content.length > 50 ? '...' : ''}</div>
-                        <div class="history-time">版本 ${index + 1}</div>
-                    `;
-                    
-                    item.onclick = () => {
-                        document.getElementById('monaco-editor').value = content;
-                        this.historyIndex = index;
-                        this.onContentChange();
-                        this.closeHistory();
-                        this.showToast('已恢复历史版本', 'success');
-                    };
-                    
-                    list.appendChild(item);
-                });
             }
             
             // 更改视图模式
             changeViewMode(mode) {
                 this.viewMode = mode;
-                const sidePanel = document.getElementById('side-panel');
+                const sidebar = document.getElementById('sidebar');
                 
                 switch (mode) {
                     case 'tree':
+                        sidebar.style.display = 'flex';
+                        this.switchSidebarTab('tree');
+                        this.updateTreeView();
+                        break;
                     case 'split':
-                        sidePanel.style.display = 'flex';
+                        sidebar.style.display = 'flex';
+                        this.switchSidebarTab('tree');
                         this.updateTreeView();
                         break;
                     default:
-                        sidePanel.style.display = 'none';
+                        sidebar.style.display = 'none';
                 }
                 
                 localStorage.setItem('lunatv_viewMode', mode);
             }
             
-            closeSidePanel() {
-                document.getElementById('side-panel').style.display = 'none';
+            closeSidebar() {
+                document.getElementById('sidebar').style.display = 'none';
                 document.getElementById('view-mode').value = 'editor';
                 this.viewMode = 'editor';
             }
@@ -1225,7 +1525,8 @@
                     
                     try {
                         const json = JSON.parse(content);
-                        treeContainer.innerHTML = this.generateTreeHTML(json, 0);
+                        treeContainer.innerHTML = this.generateTreeHTML(json, 0, 'root');
+                        this.setupTreeEvents();
                     } catch (e) {
                         treeContainer.innerHTML = '<div class="tree-error">JSON格式无效，无法显示树状视图</div>';
                     }
@@ -1233,35 +1534,100 @@
             }
             
             // 生成树状HTML
-            generateTreeHTML(obj, level) {
-                const indent = '&nbsp;'.repeat(level * 4);
+            generateTreeHTML(obj, level, key) {
+                const indent = level * 20;
                 let html = '';
                 
                 if (Array.isArray(obj)) {
-                    html += `<div class="tree-node">${indent}<span class="tree-toggle">▼</span>[</div>`;
+                    html += `<div class="tree-node" style="margin-left: ${indent}px;">`;
+                    html += `<span class="tree-toggle collapsed" data-path="${key}"></span>`;
+                    html += `<span class="tree-key">${key}: </span>`;
+                    html += `<span class="tree-bracket">[${obj.length}]</span>`;
+                    html += `</div>`;
+                    
+                    html += `<div class="tree-children collapsed" data-parent="${key}">`;
                     obj.forEach((item, index) => {
-                        html += `<div class="tree-node">${indent}&nbsp;&nbsp;<span class="tree-key">${index}:</span> `;
-                        if (typeof item === 'object' && item !== null) {
-                            html += '</div>' + this.generateTreeHTML(item, level + 1);
-                        } else {
-                            html += `<span class="tree-${typeof item}">${JSON.stringify(item)}</span></div>`;
-                        }
+                        const itemKey = `${key}[${index}]`;
+                        html += this.generateTreeHTML(item, level + 1, index);
                     });
-                    html += `<div class="tree-node">${indent}]</div>`;
+                    html += `</div>`;
+                    
                 } else if (typeof obj === 'object' && obj !== null) {
-                    html += `<div class="tree-node">${indent}<span class="tree-toggle">▼</span>{</div>`;
-                    Object.entries(obj).forEach(([key, value]) => {
-                        html += `<div class="tree-node">${indent}&nbsp;&nbsp;<span class="tree-key">"${key}":</span> `;
-                        if (typeof value === 'object' && value !== null) {
-                            html += '</div>' + this.generateTreeHTML(value, level + 1);
-                        } else {
-                            html += `<span class="tree-${typeof value}">${JSON.stringify(value)}</span></div>`;
-                        }
+                    const keys = Object.keys(obj);
+                    html += `<div class="tree-node" style="margin-left: ${indent}px;">`;
+                    html += `<span class="tree-toggle collapsed" data-path="${key}"></span>`;
+                    html += `<span class="tree-key">${key}: </span>`;
+                    html += `<span class="tree-bracket">{${keys.length}}</span>`;
+                    html += `</div>`;
+                    
+                    html += `<div class="tree-children collapsed" data-parent="${key}">`;
+                    keys.forEach(objKey => {
+                        const itemKey = `${key}.${objKey}`;
+                        html += this.generateTreeHTML(obj[objKey], level + 1, objKey);
                     });
-                    html += `<div class="tree-node">${indent}}</div>`;
+                    html += `</div>`;
+                    
+                } else {
+                    html += `<div class="tree-node" style="margin-left: ${indent}px;">`;
+                    html += `<span class="tree-indent"></span>`;
+                    html += `<span class="tree-key">${key}: </span>`;
+                    html += `<span class="tree-${typeof obj}">${JSON.stringify(obj)}</span>`;
+                    html += `</div>`;
                 }
                 
                 return html;
+            }
+            
+            // 设置树状图事件
+            setupTreeEvents() {
+                document.querySelectorAll('.tree-toggle').forEach(toggle => {
+                    toggle.onclick = (e) => {
+                        e.stopPropagation();
+                        this.toggleTreeNode(toggle);
+                    };
+                });
+            }
+            
+            // 切换树节点
+            toggleTreeNode(toggle) {
+                const path = toggle.dataset.path;
+                const children = document.querySelector(`.tree-children[data-parent="${path}"]`);
+                
+                if (children) {
+                    const isCollapsed = children.classList.contains('collapsed');
+                    
+                    if (isCollapsed) {
+                        children.classList.remove('collapsed');
+                        toggle.classList.remove('collapsed');
+                        toggle.classList.add('expanded');
+                    } else {
+                        children.classList.add('collapsed');
+                        toggle.classList.remove('expanded');
+                        toggle.classList.add('collapsed');
+                    }
+                }
+            }
+            
+            // 展开所有节点
+            expandAllTree() {
+                document.querySelectorAll('.tree-children').forEach(children => {
+                    children.classList.remove('collapsed');
+                });
+                document.querySelectorAll('.tree-toggle').forEach(toggle => {
+                    toggle.classList.remove('collapsed');
+                    toggle.classList.add('expanded');
+                });
+            }
+            
+            // 折叠所有节点
+            collapseAllTree() {
+                document.querySelectorAll('.tree-children').forEach(children => {
+                    children.classList.add('collapsed');
+                });
+                document.querySelectorAll('.tree-toggle').forEach(toggle => {
+                    toggle.classList.remove('expanded');
+                    toggle.classList.add('collapsed');
+                });
             }
             
             // GitHub相关方法
@@ -1276,6 +1642,7 @@
                 this.isConnected = true;
                 this.updateConnectionStatus();
                 this.showToast('GitHub连接成功', 'success');
+                this.loadJSONFiles(); // 重新加载文件列表
                 localStorage.setItem('lunatv_github_connected', 'true');
             }
             
@@ -1283,6 +1650,7 @@
                 this.isConnected = true;
                 this.updateConnectionStatus();
                 this.showToast('已进入演示模式', 'info');
+                this.loadJSONFiles(); // 加载演示文件
                 
                 // 隐藏token输入区
                 document.getElementById('token-section').style.display = 'none';
@@ -1300,7 +1668,6 @@
                     
                     // 启用相关按钮
                     document.getElementById('save-btn').disabled = false;
-                    document.getElementById('load-btn').disabled = false;
                 } else {
                     statusDot.classList.remove('connected');
                     statusText.textContent = '未连接';
@@ -1308,11 +1675,10 @@
                     
                     // 禁用相关按钮
                     document.getElementById('save-btn').disabled = true;
-                    document.getElementById('load-btn').disabled = true;
                 }
             }
             
-            saveToGitHub() {
+            async saveToGitHub() {
                 if (!this.isConnected) {
                     this.showToast('请先连接GitHub', 'error');
                     return;
@@ -1324,44 +1690,16 @@
                     return;
                 }
                 
-                // 模拟保存到GitHub
-                setTimeout(() => {
-                    this.updateSaveStatus(true);
-                    this.showToast('配置已保存到GitHub', 'success');
-                }, 1000);
-            }
-            
-            loadFromGitHub() {
-                if (!this.isConnected) {
-                    this.showToast('请先连接GitHub', 'error');
+                if (!this.currentFile) {
+                    this.showToast('请先选择要保存的文件', 'error');
                     return;
                 }
                 
-                // 模拟从GitHub加载
-                const sampleConfig = {
-                    "sites": [
-                        {
-                            "key": "csp_XYQHiker",
-                            "name": "香雅情",
-                            "type": 3,
-                            "api": "csp_XYQHiker",
-                            "searchable": 1,
-                            "quickSearch": 1,
-                            "filterable": 1
-                        }
-                    ],
-                    "wallpaper": "https://picsum.photos/1920/1080",
-                    "spider": "https://raw.githubusercontent.com/user/repo/main/spider.jar",
-                    "warningText": "本应用仅供学习交流使用",
-                    "disclaimer": "免责声明内容",
-                    "version": "1.2.0"
-                };
-                
+                // 模拟保存到GitHub
                 setTimeout(() => {
-                    document.getElementById('monaco-editor').value = JSON.stringify(sampleConfig, null, 2);
-                    this.onContentChange();
-                    this.showToast('配置已从GitHub加载', 'success');
-                }, 500);
+                    this.updateSaveStatus(true);
+                    this.showToast(`配置已保存到GitHub: ${this.currentFile}`, 'success');
+                }, 1000);
             }
             
             // 文件操作
@@ -1379,6 +1717,10 @@
                     document.getElementById('monaco-editor').value = content;
                     this.onContentChange();
                     this.showToast(`文件 "${file.name}" 上传成功`, 'success');
+                    
+                    // 更新当前文件名
+                    this.currentFile = file.name;
+                    document.getElementById('current-file').textContent = file.name;
                 };
                 reader.readAsText(file);
                 
@@ -1388,18 +1730,65 @@
             
             downloadFile() {
                 const content = document.getElementById('monaco-editor').value;
+                const filename = this.currentFile || `luna-tv-config-${new Date().toISOString().split('T')[0]}.json`;
+                
                 const blob = new Blob([content], { type: 'application/json' });
                 const url = URL.createObjectURL(blob);
                 const a = document.createElement('a');
                 
                 a.href = url;
-                a.download = `luna-tv-config-${new Date().toISOString().split('T')[0]}.json`;
+                a.download = filename;
                 document.body.appendChild(a);
                 a.click();
                 document.body.removeChild(a);
                 URL.revokeObjectURL(url);
                 
                 this.showToast('文件下载成功', 'success');
+            }
+            
+            // 历史记录管理
+            updateHistoryPanel() {
+                const list = document.getElementById('history-list');
+                list.innerHTML = '';
+                
+                if (this.history.length === 0) {
+                    list.innerHTML = '<div style="color: var(--text-muted); text-align: center; padding: 20px;">暂无历史记录</div>';
+                    return;
+                }
+                
+                this.history.slice().reverse().forEach((content, reverseIndex) => {
+                    const index = this.history.length - 1 - reverseIndex;
+                    const item = document.createElement('div');
+                    item.className = 'history-item';
+                    
+                    const preview = content.substring(0, 100).replace(/\n/g, ' ');
+                    const time = new Date(Date.now() - (reverseIndex * 60000)).toLocaleString();
+                    
+                    item.innerHTML = `
+                        <div class="history-content">${preview}${content.length > 100 ? '...' : ''}</div>
+                        <div class="history-time">版本 ${index + 1} - ${time}</div>
+                    `;
+                    
+                    item.onclick = () => {
+                        document.getElementById('monaco-editor').value = content;
+                        this.historyIndex = index;
+                        this.onContentChange();
+                        this.showToast('已恢复历史版本', 'success');
+                    };
+                    
+                    list.appendChild(item);
+                });
+            }
+            
+            clearHistory() {
+                if (confirm('确定要清除所有历史记录吗？此操作无法撤销。')) {
+                    this.history = [];
+                    this.historyIndex = -1;
+                    this.updateUndoRedoButtons();
+                    this.updateHistoryPanel();
+                    localStorage.removeItem('lunatv_history');
+                    this.showToast('历史记录已清除', 'info');
+                }
             }
             
             // 自动保存
@@ -1444,12 +1833,22 @@
                 }
             }
             
+            updateCursorPosition() {
+                const editor = document.getElementById('monaco-editor');
+                const position = editor.selectionStart;
+                const content = editor.value.substring(0, position);
+                const lines = content.split('\n');
+                const line = lines.length;
+                const column = lines[lines.length - 1].length + 1;
+                
+                document.getElementById('cursor-position').textContent = `行 ${line}, 列 ${column}`;
+            }
+            
             updateStatus() {
                 // 更新光标位置（简化版）
                 const editor = document.getElementById('monaco-editor');
                 editor.addEventListener('selectionchange', () => {
-                    // 简化的光标位置更新
-                    document.getElementById('cursor-position').textContent = '行 1, 列 1';
+                    this.updateCursorPosition();
                 });
             }
             
