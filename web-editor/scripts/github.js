@@ -5,6 +5,7 @@
 class GitHubAPI {
     constructor() {
         this.app = null; // 引用主应用实例
+        this.baseURL = 'https://api.github.com';
     }
     
     /**
@@ -28,7 +29,7 @@ class GitHubAPI {
             this.app.showToast('正在连接 GitHub...', 'info');
             
             // 测试 GitHub API 连接
-            const response = await fetch(`{{https://api.github.com/repos/${this.app.repoOwner}}}/${this.app.repoName}`, {
+            const response = await fetch(`${this.baseURL}/repos/${this.app.repoOwner}/${this.app.repoName}`, {
                 headers: {
                     'Authorization': `token ${token}`,
                     'Accept': 'application/vnd.github.v3+json',
@@ -86,7 +87,7 @@ class GitHubAPI {
             this.app.showToast('正在加载文件列表...', 'info');
             
             // 获取仓库根目录内容
-            const response = await fetch(`{{https://api.github.com/repos/${this.app.repoOwner}}}/${this.app.repoName}/contents`, {
+            const response = await fetch(`${this.baseURL}/repos/${this.app.repoOwner}/${this.app.repoName}/contents`, {
                 headers: {
                     'Authorization': `token ${this.app.githubToken}`,
                     'Accept': 'application/vnd.github.v3+json',
@@ -148,7 +149,7 @@ class GitHubAPI {
         
         try {
             // 使用 raw 内容 API 直接获取文件内容
-            const response = await fetch(`{{https://api.github.com/repos/${this.app.repoOwner}}}/${this.app.repoName}/contents/${filePath}`, {
+            const response = await fetch(`${this.baseURL}/repos/${this.app.repoOwner}/${this.app.repoName}/contents/${filePath}`, {
                 headers: {
                     'Authorization': `token ${this.app.githubToken}`,
                     'Accept': 'application/vnd.github.v3.raw',
@@ -201,7 +202,7 @@ class GitHubAPI {
             this.app.showToast('正在保存到 GitHub...', 'info');
             
             // 获取文件的最新 SHA（防止并发修改冲突）
-            const fileInfoResponse = await fetch(`{{https://api.github.com/repos/${this.app.repoOwner}}}/${this.app.repoName}/contents/${this.app.currentFile.path}`, {
+            const fileInfoResponse = await fetch(`${this.baseURL}/repos/${this.app.repoOwner}/${this.app.repoName}/contents/${this.app.currentFile.path}`, {
                 headers: {
                     'Authorization': `token ${this.app.githubToken}`,
                     'Accept': 'application/vnd.github.v3+json',
@@ -216,7 +217,7 @@ class GitHubAPI {
             }
             
             // 保存文件
-            const response = await fetch(`{{https://api.github.com/repos/${this.app.repoOwner}}}/${this.app.repoName}/contents/${this.app.currentFile.path}`, {
+            const response = await fetch(`${this.baseURL}/repos/${this.app.repoOwner}/${this.app.repoName}/contents/${this.app.currentFile.path}`, {
                 method: 'PUT',
                 headers: {
                     'Authorization': `token ${this.app.githubToken}`,
@@ -299,7 +300,7 @@ class GitHubAPI {
         try {
             this.app.showToast('正在创建文件...', 'info');
             
-            const response = await fetch(`{{https://api.github.com/repos/${this.app.repoOwner}}}/${this.app.repoName}/contents/${filename}`, {
+            const response = await fetch(`${this.baseURL}/repos/${this.app.repoOwner}/${this.app.repoName}/contents/${filename}`, {
                 method: 'PUT',
                 headers: {
                     'Authorization': `token ${this.app.githubToken}`,
@@ -342,96 +343,11 @@ class GitHubAPI {
     }
     
     /**
-     * 删除文件
-     */
-    async deleteFile(filePath, sha) {
-        if (!this.app.isConnected || !this.app.githubToken) {
-            this.app.showToast('请先连接 GitHub', 'error');
-            return;
-        }
-        
-        if (!confirm(`确定要删除文件 "${filePath}" 吗？此操作不可撤销。`)) {
-            return;
-        }
-        
-        try {
-            this.app.showToast('正在删除文件...', 'info');
-            
-            const response = await fetch(`{{https://api.github.com/repos/${this.app.repoOwner}}}/${this.app.repoName}/contents/${filePath}`, {
-                method: 'DELETE',
-                headers: {
-                    'Authorization': `token ${this.app.githubToken}`,
-                    'Accept': 'application/vnd.github.v3+json',
-                    'Content-Type': 'application/json',
-                    'User-Agent': 'Luna-TV-Editor/2.0'
-                },
-                body: JSON.stringify({
-                    message: `Delete ${filePath} via Luna TV Editor`,
-                    sha: sha,
-                    author: {
-                        name: 'Luna TV Editor',
-                        email: 'noreply@lunatv.editor'
-                    }
-                })
-            });
-            
-            if (!response.ok) {
-                throw new Error(`删除文件失败: ${response.status} ${response.statusText}`);
-            }
-            
-            this.app.showToast(`文件删除成功: ${filePath}`, 'success');
-            
-            // 刷新文件列表
-            await this.loadJSONFiles();
-            
-            // 如果删除的是当前文件，清空编辑器
-            if (this.app.currentFile && this.app.currentFile.path === filePath) {
-                this.app.currentFile = null;
-                document.getElementById('current-file').textContent = '📄 未选择文件';
-                document.getElementById('editor').value = '';
-                this.app.onContentChange();
-            }
-            
-        } catch (error) {
-            console.error('删除文件失败:', error);
-            this.app.showToast('删除文件失败: ' + error.message, 'error');
-        }
-    }
-    
-    /**
-     * 获取仓库信息
-     */
-    async getRepoInfo() {
-        if (!this.app.isConnected || !this.app.githubToken) {
-            return null;
-        }
-        
-        try {
-            const response = await fetch(`{{https://api.github.com/repos/${this.app.repoOwner}}}/${this.app.repoName}`, {
-                headers: {
-                    'Authorization': `token ${this.app.githubToken}`,
-                    'Accept': 'application/vnd.github.v3+json',
-                    'User-Agent': 'Luna-TV-Editor/2.0'
-                }
-            });
-            
-            if (response.ok) {
-                return await response.json();
-            }
-            
-        } catch (error) {
-            console.error('获取仓库信息失败:', error);
-        }
-        
-        return null;
-    }
-    
-    /**
      * 检查 API 限制
      */
     async checkRateLimit() {
         try {
-            const response = await fetch('https://api.github.com/rate_limit', {
+            const response = await fetch(`${this.baseURL}/rate_limit`, {
                 headers: {
                     'Authorization': this.app.githubToken ? `token ${this.app.githubToken}` : '',
                     'Accept': 'application/vnd.github.v3+json',
@@ -449,24 +365,6 @@ class GitHubAPI {
         }
         
         return null;
-    }
-    
-    /**
-     * 断开 GitHub 连接
-     */
-    disconnect() {
-        this.app.isConnected = false;
-        this.app.githubToken = null;
-        this.app.updateConnectionStatus();
-        
-        // 清除保存的 Token
-        localStorage.removeItem('lunatv_github_token');
-        document.getElementById('github-token').value = '';
-        
-        // 返回演示模式
-        this.app.enterDemoMode();
-        
-        this.app.showToast('已断开 GitHub 连接', 'info');
     }
 }
 
