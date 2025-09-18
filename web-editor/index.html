@@ -3,24 +3,527 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🌙 Luna TV 配置编辑器</title>
-    <meta name="description" content="专业的JSON配置文件编辑器，专为Luna TV配置管理而设计">
+    <title>🌙 Luna TV 配置编辑器 - JSON Formatter & Validator</title>
+    <meta name="description" content="专业的JSON配置文件编辑器，支持格式化、验证、转换等功能">
+    <meta name="keywords" content="JSON,编辑器,格式化,验证,Luna TV,配置">
+    
+    <!-- PWA 配置 -->
     <link rel="manifest" href="manifest.json">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌙</text></svg>">
     
     <!-- 样式文件 -->
-    <link rel="stylesheet" href="styles/main.css">
+    <style>
+        /* 内嵌样式 - 参考JSONFormatter风格 */
+        :root {
+            --primary-green: #28a745;
+            --primary-blue: #007bff;
+            --primary-orange: #fd7e14;
+            --primary-red: #dc3545;
+            --primary-purple: #6f42c1;
+            --bg-primary: #1a1a1a;
+            --bg-secondary: #2d2d2d;
+            --bg-tertiary: #404040;
+            --bg-card: #252525;
+            --text-primary: #ffffff;
+            --text-secondary: #cccccc;
+            --text-muted: #888888;
+            --border-color: #444444;
+            --border-radius: 8px;
+            --gradient-primary: linear-gradient(135deg, var(--primary-blue), var(--primary-purple));
+            --gradient-success: linear-gradient(135deg, var(--primary-green), #20c997);
+            --transition: all 0.3s ease;
+        }
+        
+        [data-theme="light"] {
+            --bg-primary: #ffffff;
+            --bg-secondary: #f8f9fa;
+            --bg-tertiary: #e9ecef;
+            --bg-card: #ffffff;
+            --text-primary: #212529;
+            --text-secondary: #495057;
+            --text-muted: #6c757d;
+            --border-color: #dee2e6;
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        html, body {
+            height: 100%;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+        
+        .app-container {
+            height: 100vh;
+            display: grid;
+            grid-template-rows: auto auto auto 1fr auto;
+            grid-template-areas: "header" "toolbar" "token" "main" "status";
+        }
+        
+        /* 头部样式 */
+        .header {
+            grid-area: header;
+            background: var(--gradient-primary);
+            padding: 16px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: linear-gradient(45deg, transparent 30%, rgba(255,255,255,0.1) 50%, transparent 70%);
+            animation: shimmer 3s infinite;
+        }
+        
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+        
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            z-index: 1;
+        }
+        
+        .app-title {
+            color: white;
+            font-size: 22px;
+            font-weight: 700;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .status-indicator {
+            background: rgba(255,255,255,0.2);
+            padding: 8px 16px;
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.3);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .status-dot {
+            width: 12px; height: 12px;
+            border-radius: 50%;
+            background: var(--primary-red);
+            border: 2px solid white;
+            transition: var(--transition);
+        }
+        
+        .status-dot.connected {
+            background: var(--primary-green);
+            box-shadow: 0 0 10px var(--primary-green);
+        }
+        
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            z-index: 1;
+        }
+        
+        /* 工具栏样式 */
+        .toolbar {
+            grid-area: toolbar;
+            background: var(--bg-secondary);
+            border-bottom: 3px solid var(--primary-blue);
+            padding: 16px 24px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            justify-content: space-between;
+        }
+        
+        .toolbar-section {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        /* 按钮样式 */
+        .btn {
+            position: relative;
+            overflow: hidden;
+            padding: 10px 16px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border: none;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+        }
+        
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%;
+            width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+            transition: var(--transition);
+        }
+        
+        .btn:hover::before { left: 100%; }
+        
+        .btn-primary {
+            background: var(--gradient-primary);
+            color: white;
+            box-shadow: 0 2px 8px rgba(0,123,255,0.3);
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,123,255,0.4);
+        }
+        
+        .btn-secondary {
+            background: var(--bg-card);
+            color: var(--text-primary);
+            border: 2px solid var(--border-color);
+        }
+        
+        .btn-secondary:hover {
+            border-color: var(--primary-blue);
+            color: var(--primary-blue);
+        }
+        
+        .btn-outline {
+            background: transparent;
+            border: 2px solid var(--primary-green);
+            color: var(--primary-green);
+        }
+        
+        .btn-outline:hover {
+            background: var(--primary-green);
+            color: white;
+        }
+        
+        .btn-icon {
+            width: 40px; height: 40px;
+            padding: 0;
+            border-radius: 50%;
+            font-size: 16px;
+        }
+        
+        /* Token 输入区 */
+        .token-section {
+            grid-area: token;
+            background: var(--bg-card);
+            border-bottom: 2px solid var(--primary-blue);
+            padding: 20px 24px;
+            position: relative;
+        }
+        
+        .token-section::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 3px;
+            background: var(--gradient-primary);
+        }
+        
+        .token-input-group {
+            max-width: 800px;
+        }
+        
+        .token-input-group label {
+            display: block;
+            margin-bottom: 12px;
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+        
+        .input-with-button {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+        
+        .input-with-button input {
+            flex: 1;
+            padding: 12px 16px;
+            border: 2px solid var(--border-color);
+            border-radius: var(--border-radius);
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            font-size: 14px;
+            transition: var(--transition);
+        }
+        
+        .input-with-button input:focus {
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 3px rgba(0,123,255,0.1);
+            outline: none;
+        }
+        
+        /* 主内容区 */
+        .main-content {
+            grid-area: main;
+            display: flex;
+            background: var(--bg-secondary);
+            overflow: hidden;
+        }
+        
+        .editor-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: var(--bg-card);
+            border-radius: var(--border-radius);
+            margin: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            border: 2px solid var(--border-color);
+            overflow: hidden;
+        }
+        
+        .editor {
+            flex: 1;
+            background: var(--bg-primary);
+            font-family: 'Monaco', 'Menlo', 'Courier New', monospace;
+        }
+        
+        /* 侧边面板 */
+        .side-panel {
+            width: 350px;
+            background: var(--bg-card);
+            border-left: 3px solid var(--primary-blue);
+            display: flex;
+            flex-direction: column;
+            box-shadow: -4px 0 12px rgba(0,0,0,0.15);
+        }
+        
+        .panel-header {
+            background: var(--gradient-primary);
+            color: white;
+            padding: 16px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .panel-content {
+            flex: 1;
+            overflow: auto;
+            padding: 16px;
+        }
+        
+        .json-tree {
+            font-family: 'Monaco', 'Menlo', 'Courier New', monospace;
+            font-size: 13px;
+            line-height: 1.8;
+        }
+        
+        .tree-node {
+            margin: 4px 0;
+            padding: 4px 8px;
+            border-radius: 4px;
+            transition: var(--transition);
+        }
+        
+        .tree-node:hover {
+            background: var(--bg-tertiary);
+        }
+        
+        .tree-key { color: var(--primary-blue); font-weight: 600; }
+        .tree-string { color: var(--primary-green); }
+        .tree-number { color: var(--primary-orange); font-weight: 600; }
+        .tree-boolean { color: var(--primary-purple); font-weight: 600; }
+        .tree-null { color: var(--text-muted); font-style: italic; }
+        
+        /* 状态栏 */
+        .status-bar {
+            grid-area: status;
+            background: var(--bg-card);
+            border-top: 2px solid var(--primary-blue);
+            padding: 8px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12px;
+            box-shadow: 0 -2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .status-left, .status-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        .status-valid {
+            color: var(--primary-green);
+            font-weight: 600;
+        }
+        
+        .status-invalid {
+            color: var(--primary-red);
+            font-weight: 600;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+        
+        /* 错误面板 */
+        .error-panel {
+            position: absolute;
+            bottom: 0; left: 0; right: 0;
+            background: var(--primary-red);
+            color: white;
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 100;
+            animation: slideUp 0.3s ease-out;
+        }
+        
+        @keyframes slideUp {
+            from { transform: translateY(100%); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        
+        .error-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 16px;
+            background: rgba(0,0,0,0.2);
+            backdrop-filter: blur(10px);
+        }
+        
+        .error-content {
+            padding: 12px 16px;
+            font-family: monospace;
+            font-size: 13px;
+            white-space: pre-wrap;
+        }
+        
+        /* 加载动画 */
+        .loading-overlay {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: var(--bg-primary);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+        }
+        
+        .loading-spinner {
+            width: 50px; height: 50px;
+            border: 4px solid rgba(255,255,255,0.1);
+            border-top: 4px solid var(--primary-blue);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 16px;
+            position: relative;
+        }
+        
+        .loading-spinner::after {
+            content: '';
+            position: absolute;
+            top: -4px; left: -4px; right: -4px; bottom: -4px;
+            border: 4px solid transparent;
+            border-top: 4px solid var(--primary-green);
+            border-radius: 50%;
+            animation: spin 1.5s linear infinite reverse;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Toast通知 */
+        .toast-container {
+            position: fixed;
+            top: 20px; right: 20px;
+            z-index: 2000;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .toast {
+            padding: 12px 16px;
+            border-radius: 8px;
+            color: white;
+            font-weight: 500;
+            max-width: 350px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            backdrop-filter: blur(10px);
+            animation: toastSlideIn 0.3s ease-out;
+            position: relative;
+            cursor: pointer;
+        }
+        
+        .toast::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0;
+            width: 4px; height: 100%;
+            background: rgba(255,255,255,0.8);
+            border-radius: 4px 0 0 4px;
+        }
+        
+        @keyframes toastSlideIn {
+            from { opacity: 0; transform: translateX(100%); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        
+        .toast.success { background: var(--gradient-success); }
+        .toast.error { background: linear-gradient(135deg, var(--primary-red), #e74c3c); }
+        .toast.warning { background: linear-gradient(135deg, var(--primary-orange), #ffc107); }
+        .toast.info { background: var(--gradient-primary); }
+        
+        /* 备用编辑器 */
+        .backup-editor {
+            font-family: 'Monaco', 'Menlo', 'Courier New', monospace;
+            line-height: 1.6;
+            border: none;
+            outline: none;
+            resize: none;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+        }
+        
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .app-title { font-size: 18px; }
+            .header { padding: 12px 16px; }
+            .toolbar { padding: 12px 16px; }
+            .token-section { padding: 16px; }
+            .side-panel { width: 100%; position: fixed; top: 0; right: 0; bottom: 0; z-index: 1000; }
+        }
+    </style>
 </head>
 <body data-theme="dark">
     <!-- 加载界面 -->
     <div id="loading" class="loading-overlay">
         <div class="loading-spinner"></div>
-        <p>正在加载编辑器...</p>
+        <p>正在加载 Luna TV 配置编辑器...</p>
     </div>
 
-    <!-- 主容器 -->
+    <!-- 主应用 -->
     <div id="app" class="app-container" style="display: none;">
-        <!-- 头部工具栏 -->
+        <!-- 头部 -->
         <header class="header">
             <div class="header-left">
                 <h1 class="app-title">🌙 Luna TV 配置编辑器</h1>
@@ -32,27 +535,28 @@
             
             <div class="header-right">
                 <button class="btn btn-icon" id="theme-toggle" title="切换主题">🌓</button>
-                <button class="btn btn-icon" id="fullscreen-toggle" title="全屏模式 (F11)">⛶</button>
-                <button class="btn btn-primary" id="save-btn" title="保存到 GitHub (Ctrl+S)">💾 保存</button>
+                <button class="btn btn-icon" id="fullscreen-toggle" title="全屏模式">⛶</button>
+                <button class="btn btn-primary" id="save-btn" title="保存到 GitHub">💾 保存</button>
             </div>
         </header>
 
         <!-- 工具栏 -->
         <nav class="toolbar">
             <div class="toolbar-section">
-                <button class="btn btn-secondary" id="load-btn" title="从 GitHub 加载 (Ctrl+O)">📥 加载配置</button>
-                <button class="btn btn-secondary" id="upload-btn" title="上传文件 (Ctrl+U)">📤 上传文件</button>
-                <button class="btn btn-secondary" id="download-btn" title="下载文件 (Ctrl+D)">📥 下载文件</button>
+                <button class="btn btn-secondary" id="load-btn">📥 加载配置</button>
+                <button class="btn btn-secondary" id="upload-btn">📤 上传文件</button>
+                <button class="btn btn-secondary" id="download-btn">📥 下载文件</button>
             </div>
             
             <div class="toolbar-section">
-                <button class="btn btn-outline" id="format-btn" title="格式化 JSON">🔧 格式化</button>
-                <button class="btn btn-outline" id="compress-btn" title="压缩 JSON">📦 压缩</button>
-                <button class="btn btn-outline" id="validate-btn" title="验证 JSON">✅ 验证</button>
+                <button class="btn btn-outline" id="format-btn">🔧 格式化</button>
+                <button class="btn btn-outline" id="compress-btn">📦 压缩</button>
+                <button class="btn btn-outline" id="validate-btn">✅ 验证</button>
+                <button class="btn btn-outline" id="copy-btn">📋 复制</button>
             </div>
             
             <div class="toolbar-section">
-                <select id="view-mode" class="select" title="切换视图模式">
+                <select id="view-mode" class="btn">
                     <option value="editor">编辑器</option>
                     <option value="tree">树状图</option>
                     <option value="split">分屏</option>
@@ -60,37 +564,36 @@
             </div>
         </nav>
 
-        <!-- GitHub Token 输入区域 -->
+        <!-- GitHub Token 输入 -->
         <div id="token-section" class="token-section">
             <div class="token-input-group">
-                <label for="github-token">GitHub Personal Access Token:</label>
+                <label for="github-token">🔑 GitHub Personal Access Token:</label>
                 <div class="input-with-button">
                     <input 
                         type="password" 
                         id="github-token" 
-                        placeholder="请输入您的 GitHub Token" 
+                        placeholder="请输入您的 GitHub Token (需要 repo 权限)" 
                         autocomplete="current-password"
                     >
                     <button class="btn btn-primary" id="connect-btn">连接</button>
                 </div>
                 <small class="help-text">
-                    需要 <code>repo</code> 权限。<a href="https://github.com/settings/tokens" target="_blank">获取 Token</a>
+                    需要 <code>repo</code> 权限。<a href="https://github.com/settings/tokens" target="_blank">获取 Token</a> | 
+                    <a href="#" id="demo-mode">使用演示模式</a>
                 </small>
             </div>
         </div>
 
-        <!-- 主编辑区域 -->
+        <!-- 主编辑区 -->
         <main class="main-content">
-            <!-- 编辑器容器 -->
             <div class="editor-container">
                 <div id="monaco-editor" class="editor"></div>
                 
-                <!-- 错误提示 -->
+                <!-- 错误面板 -->
                 <div id="error-panel" class="error-panel" style="display: none;">
                     <div class="error-header">
-                        <span class="error-icon">⚠️</span>
-                        <span class="error-title">JSON 格式错误</span>
-                        <button class="error-close" id="close-error">✕</button>
+                        <span>⚠️ JSON 格式错误</span>
+                        <button class="btn btn-icon" id="close-error" style="color: white;">✕</button>
                     </div>
                     <div class="error-content" id="error-message"></div>
                 </div>
@@ -99,8 +602,8 @@
             <!-- 侧边面板 -->
             <aside class="side-panel" id="side-panel" style="display: none;">
                 <div class="panel-header">
-                    <h3 class="panel-title">JSON 树状视图</h3>
-                    <button class="btn btn-icon" id="close-panel">✕</button>
+                    <h3>JSON 树状视图</h3>
+                    <button class="btn btn-icon" id="close-panel" style="color: white;">✕</button>
                 </div>
                 <div class="panel-content">
                     <div id="json-tree" class="json-tree"></div>
@@ -108,7 +611,7 @@
             </aside>
         </main>
 
-        <!-- 底部状态栏 -->
+        <!-- 状态栏 -->
         <footer class="status-bar">
             <div class="status-left">
                 <span id="cursor-position">行 1, 列 1</span>
@@ -123,90 +626,57 @@
         </footer>
     </div>
 
-    <!-- 模态对话框 -->
-    <div id="modal-overlay" class="modal-overlay" style="display: none;">
-        <div class="modal">
-            <div class="modal-header">
-                <h3 id="modal-title">标题</h3>
-                <button class="btn btn-icon" id="modal-close">✕</button>
-            </div>
-            <div class="modal-body" id="modal-body">
-                <!-- 动态内容 -->
-            </div>
-            <div class="modal-footer">
-                <button class="btn btn-secondary" id="modal-cancel">取消</button>
-                <button class="btn btn-primary" id="modal-confirm">确定</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Toast 通知 -->
+    <!-- Toast通知容器 -->
     <div id="toast-container" class="toast-container"></div>
 
     <!-- 隐藏的文件输入 -->
     <input type="file" id="file-input" accept=".json" style="display: none;">
 
-    <!-- 脚本加载 -->
-    <!-- 使用多个CDN备选方案确保Monaco Editor能够加载 -->
+    <!-- Monaco Editor 加载 -->
     <script>
-        // Monaco Editor 加载器
-        window.monacoLoaderConfig = {
-            paths: {
-                'vs': 'https://cdn.jsdelivr.net/npm/monaco-editor@0.44.0/min/vs'
-            },
-            'vs/nls': {
-                availableLanguages: {
-                    '*': 'zh-cn'
-                }
-            }
-        };
-        
-        // 备选CDN列表
+        // Monaco Editor 多 CDN 加载器
         const monacoUrls = [
-            'https://cdn.jsdelivr.net/npm/monaco-editor@0.44.0/min/vs/loader.js',
-            'https://unpkg.com/monaco-editor@0.44.0/min/vs/loader.js',
-            'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.44.0/min/vs/loader.min.js'
+            '179',
+            '180',
+            '181'
         ];
         
         async function loadMonaco() {
             for (const url of monacoUrls) {
                 try {
-                    console.log('尝试从CDN加载Monaco Editor:', url);
+                    console.log('尝试加载 Monaco Editor:', url);
                     await new Promise((resolve, reject) => {
                         const script = document.createElement('script');
                         script.src = url;
                         script.onload = resolve;
                         script.onerror = reject;
-                        script.timeout = 10000; // 10秒超时
                         document.head.appendChild(script);
+                        setTimeout(reject, 10000); // 10秒超时
                     });
                     
-                    // 配置Monaco路径
-                    require.config(window.monacoLoaderConfig);
+                    // 配置文件路径
+                    require.config({ paths: { 'vs': url.replace('/loader.js', '') } });
                     
-                    // 加载Monaco Editor
+                    // 加载编辑器
                     require(['vs/editor/editor.main'], function() {
-                        console.log('Monaco Editor 加载成功');
+                        console.log('✨ Monaco Editor 加载成功');
                         window.monacoReady = true;
-                        
-                        // 触发应用初始化
                         document.dispatchEvent(new Event('monaco-ready'));
                     });
                     
-                    return; // 成功加载，退出循环
+                    return; // 成功加载，退出
                 } catch (error) {
-                    console.warn('CDN加载失败:', url, error);
-                    continue; // 尝试下一个CDN
+                    console.warn('CDN 加载失败:', url);
+                    continue;
                 }
             }
             
-            // 所有CDN都失败，使用备用编辑器
-            console.error('所有Monaco Editor CDN都无法加载，使用备用编辑器');
+            // 所有 CDN 都失败
+            console.error('😨 Monaco Editor 加载失败，使用备用编辑器');
             window.useBackupEditor = true;
             document.dispatchEvent(new Event('monaco-ready'));
         }
         
-        // 开始加载Monaco
         loadMonaco();
     </script>
     
@@ -215,5 +685,12 @@
     <script src="scripts/github-api.js"></script>
     <script src="scripts/editor.js"></script>
     <script src="scripts/app.js"></script>
+    
+    <!-- 统计代码(可选) -->
+    <script>
+        // Google Analytics 或其他统计代码
+        console.log('🌙 Luna TV 配置编辑器 v1.0.0');
+        console.log('🚀 基于 jsonformatter.org 的增强版');
+    </script>
 </body>
 </html>
