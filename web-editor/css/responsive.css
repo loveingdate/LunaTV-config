@@ -1,0 +1,640 @@
+/* ==========================================================================
+   Luna TV 配置编辑器 - 响应式样式
+   ========================================================================== */
+
+/* 基础媒体查询断点 */
+/* xs: 0-479px */
+/* sm: 480-767px */
+/* md: 768-1023px */
+/* lg: 1024-1279px */
+/* xl: 1280px+ */
+
+/* 大屏幕优化 (1280px+) */
+@media (min-width: 1280px) {
+    .container {
+        max-width: 1280px;
+    }
+    
+    .config-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+    
+    .shortcuts-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+    
+    .editor-container {
+        min-height: 700px;
+    }
+    
+    .help-modal {
+        width: 800px;
+    }
+    
+    .settings-modal {
+        width: 600px;
+    }
+}
+
+/* 桌面端 (1024-1279px) */
+@media (min-width: 1024px) and (max-width: 1279px) {
+    .container {
+        max-width: 1024px;
+    }
+    
+    .app-header {
+        padding: 0 1.5rem;
+    }
+    
+    .config-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+    
+    .toolbar {
+        gap: 1.5rem;
+    }
+    
+    .btn-group {
+        gap: 0.75rem;
+    }
+}
+
+/* 平板端 (768-1023px) */
+@media (min-width: 768px) and (max-width: 1023px) {
+    .app-header {
+        height: 56px;
+        padding: 0 1rem;
+    }
+    
+    .app-logo .logo-text {
+        font-size: 1rem;
+    }
+    
+    .header-right {
+        gap: 0.25rem;
+    }
+    
+    .toolbar {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 1rem;
+        padding: 1rem;
+    }
+    
+    .toolbar-section {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .btn-group {
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+    
+    .config-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1.5rem;
+    }
+    
+    .github-panel.collapsed {
+        max-height: 56px;
+    }
+    
+    .editor-tabs {
+        overflow-x: auto;
+        scrollbar-width: thin;
+    }
+    
+    .tab-btn {
+        flex-shrink: 0;
+        min-width: 120px;
+    }
+    
+    .modal {
+        margin: 1rem;
+        max-width: calc(100vw - 2rem);
+        max-height: calc(100vh - 2rem);
+    }
+    
+    .help-modal,
+    .settings-modal {
+        width: auto;
+    }
+    
+    .status-bar {
+        font-size: 0.7rem;
+    }
+    
+    .status-left,
+    .status-right {
+        gap: 0.75rem;
+    }
+    
+    .notification {
+        max-width: 350px;
+        margin-right: 1rem;
+    }
+}
+
+/* 移动端大屏 (480-767px) */
+@media (min-width: 480px) and (max-width: 767px) {
+    .app-header {
+        height: 52px;
+        padding: 0 0.75rem;
+    }
+    
+    .header-left {
+        gap: 1rem;
+    }
+    
+    .app-logo .logo-text {
+        display: none;
+    }
+    
+    .app-status {
+        font-size: 0.8rem;
+    }
+    
+    .toolbar {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.75rem;
+        padding: 0.75rem;
+    }
+    
+    .toolbar-section {
+        width: 100%;
+    }
+    
+    .btn-group {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+        gap: 0.5rem;
+    }
+    
+    .btn {
+        padding: 0.625rem 0.75rem;
+        font-size: 0.8rem;
+        min-height: 44px;
+    }
+    
+    .btn span {
+        display: none;
+    }
+    
+    .config-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    
+    .config-group {
+        gap: 0.75rem;
+    }
+    
+    .panel-content {
+        padding: 0 0.75rem 0.75rem 0.75rem;
+    }
+    
+    .editor-tabs {
+        overflow-x: auto;
+    }
+    
+    .tab-btn {
+        flex-shrink: 0;
+        min-width: 100px;
+        padding: 0.625rem 0.75rem;
+    }
+    
+    .tab-btn span {
+        display: none;
+    }
+    
+    .tree-toolbar,
+    .preview-toolbar {
+        padding: 0.5rem 0.75rem;
+    }
+    
+    .json-tree,
+    .json-preview {
+        padding: 0.75rem;
+        font-size: 0.8rem;
+    }
+    
+    .status-bar {
+        padding: 0.5rem 0.75rem;
+        font-size: 0.65rem;
+        height: 32px;
+    }
+    
+    .status-center {
+        display: none;
+    }
+    
+    .status-left,
+    .status-right {
+        gap: 0.5rem;
+    }
+    
+    .modal {
+        margin: 0.75rem;
+        max-width: calc(100vw - 1.5rem);
+        max-height: calc(100vh - 1.5rem);
+    }
+    
+    .modal-header {
+        padding: 0.75rem 1rem;
+    }
+    
+    .modal-content {
+        padding: 1rem;
+    }
+    
+    .modal-title {
+        font-size: 1rem;
+    }
+    
+    .help-section {
+        margin-bottom: 1.5rem;
+    }
+    
+    .shortcuts-grid {
+        grid-template-columns: 1fr;
+        gap: 0.75rem;
+    }
+    
+    .shortcut-item {
+        padding: 0.75rem 0.5rem;
+    }
+    
+    .settings-section {
+        margin-bottom: 1.5rem;
+    }
+    
+    .setting-item {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.5rem;
+        padding: 0.75rem 0;
+    }
+    
+    .setting-slider {
+        width: 100%;
+        margin: 0;
+    }
+    
+    .notification {
+        max-width: calc(100vw - 1.5rem);
+        margin: 0 0.75rem;
+    }
+    
+    .notification-content {
+        flex: 1;
+        min-width: 0;
+    }
+}
+
+/* 移动端小屏 (0-479px) */
+@media (max-width: 479px) {
+    .app-header {
+        height: 48px;
+        padding: 0 0.5rem;
+    }
+    
+    .header-left {
+        gap: 0.5rem;
+    }
+    
+    .app-logo {
+        gap: 0.25rem;
+    }
+    
+    .app-logo .logo-text {
+        display: none;
+    }
+    
+    .app-status .status-text {
+        display: none;
+    }
+    
+    .header-right {
+        gap: 0.25rem;
+    }
+    
+    .header-btn {
+        width: 32px;
+        height: 32px;
+        font-size: 0.8rem;
+    }
+    
+    .toolbar {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.5rem;
+        padding: 0.5rem;
+    }
+    
+    .toolbar-section {
+        width: 100%;
+    }
+    
+    .btn-group {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    
+    .btn {
+        width: 100%;
+        justify-content: center;
+        padding: 0.75rem 1rem;
+        min-height: 48px;
+        font-size: 0.875rem;
+    }
+    
+    .github-panel {
+        border-left: none;
+        border-right: none;
+        border-radius: 0;
+    }
+    
+    .github-panel.collapsed {
+        max-height: 52px;
+    }
+    
+    .panel-header {
+        padding: 0.75rem 0.5rem;
+    }
+    
+    .panel-content {
+        padding: 0 0.5rem 0.5rem 0.5rem;
+    }
+    
+    .config-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    
+    .config-actions {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    
+    .config-actions .btn {
+        width: 100%;
+    }
+    
+    .editor-container {
+        border-left: none;
+        border-right: none;
+        border-radius: 0;
+    }
+    
+    .editor-tabs {
+        overflow-x: auto;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+    }
+    
+    .editor-tabs::-webkit-scrollbar {
+        display: none;
+    }
+    
+    .tab-btn {
+        flex-shrink: 0;
+        min-width: 80px;
+        padding: 0.5rem 0.25rem;
+        font-size: 0.75rem;
+    }
+    
+    .tab-btn span {
+        display: none;
+    }
+    
+    .tree-toolbar,
+    .preview-toolbar {
+        padding: 0.5rem;
+        gap: 0.25rem;
+    }
+    
+    .json-tree,
+    .json-preview {
+        padding: 0.5rem;
+        font-size: 0.75rem;
+        line-height: 1.4;
+    }
+    
+    .status-bar {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.6rem;
+        height: 28px;
+    }
+    
+    .status-center,
+    .status-right {
+        display: none;
+    }
+    
+    .status-left {
+        gap: 0.5rem;
+        overflow: hidden;
+    }
+    
+    .status-item {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    
+    .modal-overlay {
+        padding: 0;
+    }
+    
+    .modal {
+        width: 100vw;
+        height: 100vh;
+        max-width: 100vw;
+        max-height: 100vh;
+        margin: 0;
+        border-radius: 0;
+    }
+    
+    .modal-header {
+        padding: 0.5rem;
+        border-bottom: 1px solid var(--border-color);
+    }
+    
+    .modal-content {
+        padding: 0.5rem;
+        overflow-y: auto;
+    }
+    
+    .modal-title {
+        font-size: 0.9rem;
+    }
+    
+    .modal-close {
+        width: 28px;
+        height: 28px;
+    }
+    
+    .help-section {
+        margin-bottom: 1rem;
+    }
+    
+    .help-section h4 {
+        font-size: 0.9rem;
+        margin-bottom: 0.5rem;
+    }
+    
+    .help-section ol {
+        padding-left: 1rem;
+    }
+    
+    .help-section li {
+        font-size: 0.8rem;
+        margin-bottom: 0.25rem;
+    }
+    
+    .shortcuts-grid {
+        grid-template-columns: 1fr;
+        gap: 0.5rem;
+    }
+    
+    .shortcut-item {
+        padding: 0.5rem;
+        font-size: 0.75rem;
+    }
+    
+    kbd {
+        padding: 0.125rem 0.25rem;
+        font-size: 0.6rem;
+    }
+    
+    .settings-section {
+        margin-bottom: 1rem;
+    }
+    
+    .setting-item {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.5rem;
+        padding: 0.5rem 0;
+    }
+    
+    .setting-label {
+        font-size: 0.8rem;
+    }
+    
+    .setting-slider {
+        width: 100%;
+        margin: 0;
+    }
+    
+    .settings-actions {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    
+    .settings-actions .btn {
+        width: 100%;
+    }
+    
+    .notification {
+        width: 100vw;
+        max-width: 100vw;
+        margin: 0;
+        border-radius: 0;
+        border-left: none;
+        border-right: none;
+    }
+    
+    .notification-container {
+        top: 0;
+        right: 0;
+        left: 0;
+        width: 100%;
+    }
+}
+
+/* 横屏模式优化 */
+@media (max-height: 500px) and (orientation: landscape) {
+    .app-header {
+        height: 44px;
+    }
+    
+    .toolbar {
+        padding: 0.5rem 1rem;
+    }
+    
+    .github-panel.collapsed {
+        max-height: 44px;
+    }
+    
+    .status-bar {
+        height: 28px;
+        padding: 0.25rem 1rem;
+    }
+    
+    .modal {
+        max-height: 95vh;
+    }
+    
+    .notification-container {
+        top: 0.5rem;
+    }
+}
+
+/* 触摸设备优化 */
+@media (hover: none) and (pointer: coarse) {
+    .btn,
+    .header-btn,
+    .panel-toggle,
+    .tab-btn,
+    .modal-close,
+    .input-btn {
+        min-height: 44px;
+        min-width: 44px;
+    }
+    
+    .config-input {
+        min-height: 44px;
+        font-size: 16px; /* 防止iOS缩放 */
+    }
+    
+    .setting-slider {
+        min-height: 44px;
+    }
+    
+    .setting-checkbox {
+        min-width: 24px;
+        min-height: 24px;
+    }
+}
+
+/* 高分辨率屏幕优化 */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+    .loader-icon {
+        font-size: 3.5rem;
+    }
+    
+    .logo-icon {
+        font-size: 1.25rem;
+    }
+    
+    .notification-icon {
+        font-size: 1.125rem;
+    }
+}
+
+/* 容器查询支持（现代浏览器） */
+@container (max-width: 600px) {
+    .config-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@container (max-width: 400px) {
+    .shortcuts-grid {
+        grid-template-columns: 1fr;
+    }
+}
